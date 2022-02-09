@@ -35,20 +35,24 @@ republican_counts = np.array(republican_counts)
 sunspot_counts = np.array(sunspot_counts)
 last_year = 1985
 
-# Plot the data.
-plt.figure(1)
-plt.plot(years, republican_counts, 'o')
-plt.xlabel("Year")
-plt.ylabel("Number of Republicans in Congress")
-plt.figure(2)
-plt.plot(years, sunspot_counts, 'o')
-plt.xlabel("Year")
-plt.ylabel("Number of Sunspots")
-plt.figure(3)
-plt.plot(sunspot_counts[years<last_year], republican_counts[years<last_year], 'o')
-plt.xlabel("Number of Sunspots")
-plt.ylabel("Number of Republicans in Congress")
-plt.show()
+print(years)
+print(republican_counts)
+print(sunspot_counts)
+
+# # Plot the data.
+# plt.figure(1)
+# plt.plot(years, republican_counts, 'o')
+# plt.xlabel("Year")
+# plt.ylabel("Number of Republicans in Congress")
+# plt.figure(2)
+# plt.plot(years, sunspot_counts, 'o')
+# plt.xlabel("Year")
+# plt.ylabel("Number of Sunspots")
+# plt.figure(3)
+# plt.plot(sunspot_counts[years<last_year], republican_counts[years<last_year], 'o')
+# plt.xlabel("Number of Sunspots")
+# plt.ylabel("Number of Republicans in Congress")
+# plt.show()
 
 # Create the simplest basis, with just the time and an offset.
 X = np.vstack((np.ones(years.shape), years)).T
@@ -79,6 +83,10 @@ def find_weights(X,Y):
     w = np.dot(np.linalg.pinv(np.dot(X.T, X)), np.dot(X.T, Y))
     return w
 
+print("years: ")
+print(X)
+print("repub counts: ")
+print(Y)
 # Compute the regression line on a grid of inputs.
 # DO NOT CHANGE grid_years!!!!!
 grid_years = np.linspace(1960, 2005, 200)

@@ -30,11 +30,58 @@ x_test = np.arange(0, 12, .1)
 print("y is:")
 print(y_train)
 
+# def predict_knn(k=1, tau=1):
+#     """Returns predictions for the values in x_test, using KNN predictor with the specified k."""
+#     y_test = [] # list to return
+#     for x in x_test:
+#         # find k nearest inputs to x
+#         # first, calculate dist between x and all data
+#         dist = {}  # dictionary to store (distance : ydata pairs)
+#         for xdata, ydata in data:
+#             distance = np.exp(-(xdata-x)**2/tau)
+#             dist[distance] = ydata
+#
+#         print(len(dist))
+#         # sort by distance, include top k, and predict
+#         sorted_keys = sorted(dist)
+#         predict = 0
+#         for i in range(0, k):
+#             predict += dist[sorted_keys[i]]
+#             # print(i)
+#             # print(x)
+#             # print(sorted_keys)
+#             # print(dist)
+#
+#         # append the prediction to y_test
+#         y_test.append(predict/k)
+#
+#     return y_test
+
+# used for sorting the list later on
+def sortFirst(e):
+    return e[0]
+
 def predict_knn(k=1, tau=1):
     """Returns predictions for the values in x_test, using KNN predictor with the specified k."""
-    # TODO: your code here
-    return np.zeros(len(x_test))
+    y_test = []  # list to return
+    for x in x_test:
+        # find k nearest inputs to x
+        # first, calculate dist between x and all data
+        dist = [] # list to store (distance, ydata pairs)
+        for xdata, ydata in data:
+            distance = np.exp(-(xdata - x) ** 2 / tau)
+            dist.append([distance, ydata])
 
+        # sort by distance, include top k, and predict
+        dist.sort(key=sortFirst)
+        predict = 0
+        for i in range(0, k):
+            predict += dist[i][1]
+
+        # append the prediction to y_test
+        y_test.append(predict / k)
+
+    return y_test
 
 def plot_knn_preds(k):
     plt.xlim([0, 12])
