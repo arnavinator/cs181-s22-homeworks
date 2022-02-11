@@ -69,11 +69,11 @@ def predict_knn(k=1, tau=1):
         # first, calculate dist between x and all data
         dist = [] # list to store (distance, ydata pairs)
         for xdata, ydata in data:
-            distance = np.exp(-(xdata - x) ** 2 / tau)
-            dist.append([distance, ydata])
+            inv_distance = np.exp(-(xdata - x)**2 / tau)
+            dist.append([inv_distance, ydata])
 
-        # sort by distance, include top k, and predict
-        dist.sort(key=sortFirst)
+        # sort from smallest to largest dist, include top k, and predict
+        dist.sort(key=sortFirst, reverse=True)
         predict = 0
         for i in range(0, k):
             predict += dist[i][1]
