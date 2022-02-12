@@ -73,10 +73,17 @@ def predict_knn(k=1, tau=1):
             dist.append([inv_distance, ydata])
 
         # sort from smallest to largest dist, include top k, and predict
-        dist.sort(key=sortFirst, reverse=True)
+        nearest = 0
         predict = 0
-        for i in range(0, k):
-            predict += dist[i][1]
+        while (nearest < k):
+            min = dist[0]
+            for x in dist:
+                if min[0] <= x[0]:
+                    min = x
+            predict += min[1]
+            dist.remove(min)
+            nearest += 1
+
 
         # append the prediction to y_test
         y_test.append(predict / k)
