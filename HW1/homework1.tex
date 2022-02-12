@@ -114,6 +114,7 @@ should be.
 \item Take the derivative of the loss function with respect to $\tau$.
 \end{enumerate}
 
+
 \end{problem}
 
 \newpage
@@ -173,6 +174,36 @@ in the command-line using \texttt{python T1\_P1\_TestCases.py}.
 \end{enumerate}
   
 \end{framed}  
+\newpage
+\textbf{Problem 1}
+\begin{enumerate}
+    \item Observe that we don't consider the loss between the actual value and the kernel estimate when the expected value equals the actual value.
+    \begin{align}
+        \mcL(W) &= (\sum_{n=1}^N (y_n - \hat{y})^2)
+        = (\sum_{n}^N (y_n - \sum_{m\neq n}^N K(x_m, x_n) y_m)^2) \\
+        &= (\sum_{n}^N (y_n - \sum_{m\neq n}^N e^\frac{-(x_m - x_n)^T(x_m - x_n)}{\tau} y_m)^2) 
+    \end{align}
+    
+    \item  
+    \begin{align}
+        \nabla_\tau \mcL(W) &= 2(\sum_{n}^N (y_n - \sum_{m\neq n}^N e^\frac{-(x_m - x_n)^T(x_m - x_n)}{\tau} y_m)(-\sum_{m\neq n}^N \frac{((x_m - x_n)^T(x_m - x_n)}{\tau^2} e^\frac{-(x_m - x_n)^T(x_m - x_n)}{\tau} y_m) \\
+        &= -2(\sum_{n}^N (y_n - \sum_{m\neq n}^N e^\frac{-(x_m - x_n)^T(x_m - x_n)}{\tau} y_m)(\sum_{m\neq n}^N \frac{((x_m - x_n)^T(x_m - x_n)}{\tau^2} e^\frac{-(x_m - x_n)^T(x_m - x_n)}{\tau} y_m)
+    \end{align}
+
+    
+    \item Complete - test cases passed!
+    
+    
+    \item Plot is below. The dots indicate the actual datapoints, while the lines represent the prediction for different $\tau$ as indicated by the legend: 
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=0.5\textwidth]{HW1/ps1-p1.png}
+    \end{figure}
+    
+    We see that as $\tau$ becomes larger, our estimated prediction $\hat{y}$ deviates away from the actual values $y$. A larger $\tau$ decreases the selectivity of the kernel for weighting neighboring training points, such that we weight neighboring training data with relatively higher weights (neighbors become more influential) when predicting our output. \\
+    When we were making predictions on the training data, we did not include the same training data to make those predictions since it is unfair to use the matching data point and copy the information we already know. This is why when we calculated loss, $\tau = 2$ had lower loss than $\tau = 0.1$, since our kernel for $\tau = 2$ was better at guessing labels based off of all training data other than the matching testing-training data. \\ 
+    However, when using our testing data after we have trained the model, though some of the training inputs match the testing inputs, we include all training data (including matches) since we treat these training-testing input matches as coincidences (since the test data is treated as a different dataset altogether). Therefore, in this case, $\tau = 0.1$ had the lowest loss, as it very closely predicts data for which test inputs equal the training inputs.
+\end{enumerate}
 
 \newpage
 
@@ -222,6 +253,36 @@ As before, you will plot $x^*$ on the x-axis and the prediction $f(x^*)$ on the 
 
 \end{problem}
 
+\newpage
+\textbf{Problem 2}
+\begin{enumerate}
+    \item The plots are below.
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=0.5\textwidth]{HW1/ps1-p2-1.png}
+        \label{fig:my_label}
+    \end{figure}
+        \begin{figure} [h!]
+        \centering
+        \includegraphics[width=0.5\textwidth]{HW1/ps1-p2-2.png}
+        \label{fig:my_label}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=0.5\textwidth]{HW1/ps1-p2-3.png}
+        \label{fig:my_label}
+    \end{figure}
+
+    \item  We see that as $k$ increases and we consider more nearest neighbors before making our prediction, the variance between predictions decreases. For instance, for $k=1$, we see that our prediction is localized to the value of the nearest neighbor (large spread in predictions), whereas for $k=6$, our predictions are are all very close to $1.0$ (small spread in predictions). \\
+    While KNN predictions can be described by a piecewise function (since the nearest neighbors can all be the same for some adjacent test inputs), kernelized regression has a smooth and continuous prediction curve (since our kernel takes into consideration the distance of the test input from all training data points). \\
+    Since in kernelized regression, we take a weighted average of training labels but upweight labels closer to our test input, in the case where our test input is equidistant between two training inputs such that the two neighboring labels are weighted by $0.5$ and other training inputs are very far away such that they receive near $0$ weighting, our prediction for this test input will be the same for KNN with $k=2$ since KNN would pick the same training inputs, take their sum, and multiply by $0.5$. Thus, certain distributions of test inputs can lead to the same interpolation by kernelized regression and KNN given the right $\tau$ and $k$, respectively. \\
+    Meanwhile, there are no cases in which KNN and kernelized regression extrapolate (predict labels for test inputs outside of the training input range). Consider the case where our test input is larger than all training inputs. KNN will always consider the same $k$ nearest labels to extrapolate a prediction, no matter how much larger the test input grows away from closest test inputs, such that the predicted label will be the same no matter how much larger the test input grows away from the the closest training inputs. Meanwhile, kernelized regression will weigh the closest training points more strongly, such that as the test input grows farther away from the closest test inputs, our training labels will be weighted less and less such that for a test input infinitely far away from the training data, our predicted label would converge to zero (unless $\tau = \inf$, which is unreasonable). One trivial contradiction is for an ``unreasonable" dataset where all test labels are $0$ such that KNN and kernelized regression will always take their unweighted/weighted averages to predict the label $0$.\\
+    Granted that KNN and kenelized regression do not extrapolate similarly, there is no choice of $\tau$ and $k$ for which kernelized regression and KNN will produce the same prediction $f(x)$ for $\emph{any}$ $x$ for a \textit{reasonable} dataset. One trivial contradiction is for an ``unreasonable" dataset where all test labels are $0$ such that KNN and kernelized regression will always take their unweighted/weighted averages to predict $0$.
+    
+    
+    \item  We did not vary $\tau$ for KNN since KNN is concerned with simply finding the closest neighbors, but not with how much we upweight closer neighbors. In other words, whether $\tau = 1$ or $\tau = 100$, a larger kernel value will always indicates that two points are closer together as compared to a smaller kernel value. We do not care about the actual magnitude of the kernel, but only care about the relative magnitude difference between kernel outputs to deduce which points are closer than others. Therefore, it is not in our interest to vary $\tau$ since the $k$ nearest neighbors will not change.
+
+\end{enumerate}
 
 \newpage 
 
@@ -274,6 +335,42 @@ $y$ are scalars, $w$ is also a scalar.
 
 \end{problem}
 
+\newpage
+\textbf{Problem 3}
+\begin{enumerate}
+    \item 
+    \begin{align}
+        E_{x,y}[(y-\hat{y})^2] &= E_{x,y}[(y-wx)^2] = \sum_x \sum_y (y - wx)^2 p(x,y) \\
+        &=\sum_x \sum_y (y^2 - 2wxy+w^2x^2)p(x,y) \\
+        &= \sum_x\sum_y y^2 p(x,y) - 2w\sum_x\sum_y xy p(x,y) +w^2\sum_x\sum_y x^2p(x,y) \\
+        &= \sum_y y^2 p(y) - 2w\sum_x\sum_y xy p(x,y) + w^2 \sum_x x^2 p(x) \\
+        &= E_y[y^2] - 2wE_{x,y}[xy] + w^2E_x[x^2]  \\ \\
+        \nabla_w E_{x,y}[(y-\hat{y})^2] &= -2 E_{x,y}[xy] + 2wE_x[x^2] = 0 \\ \\
+        &\implies w* = \frac{E_{x,y}[xy]}{E_x[x^2]}
+    \end{align}
+    \\
+   
+    
+    \item  By the Law of Large Numbers, we can estimate our moment terms. This requires that we assume we have sufficiently large observations $N$ and that our observations are collection of independent identical random variables. Assuming inputs $x$ are IID, then $x^2$ must also be IID and we can use LLN to approximate $E_x[x^2]$. Assuming inputs $x$ are IID and since $y$ is dependent on $x$, then the joint random variable $xy$ is also IID, and we can use LLN to approximate $E_{x,y}[xy]$. 
+    \begin{align}
+        % E_x[x^2] &= \sum_{n=1}^N (x_n)^2 p(x_n) \\
+        % E_{x,y}[xy] &= \sum_{n=1}^N \sum_{m=1}^N (x_n y_m) p(x_n, y_m) \\
+        E_x[x^2] &= \frac{1}{N}\sum_{n=1}^N (x_n)^2  \\
+        E_{x,y}[xy] &= \frac{1}{N} \sum_{n=1}^N (x_n y_n) 
+    \end{align}
+    
+    
+    \item  Substituting for moment terms into our optimal expression for weights $w*$ derived in $2.$, we get:
+    \begin{align}
+        % w* = \frac{E_{x,y}[xy]}{E_x[x^2]} = \frac{\sum_{n=1}^N \sum_{m=1}^N (x_n y_m) p(x_n, y_m)}{\sum_{n=1}^N (x_n)^2 p(x_n)} = \sum_{n=1}^N \sum_{m=1}^N \frac{y_m}{x_n} p(y_m | x_n)
+        w* = \frac{E_{x,y}[xy]}{E_x[x^2]} = \frac{\frac{1}{N}}{\frac{1}{N}} \frac{\sum_{n=1}^N (x_n y_n)}{\sum_{n=1}^N (x_n)^2} = \sum_{n=1}^N \frac{y_n}{x_n} 
+    \end{align}
+    Meanwhile, from Section 2.6, we see that optimal weights are given by 
+    $$w* = (X^TX)^{-1} X^Ty \implies w* = \sum_{n=1}^N \frac{x_n}{x_n^2}y_n = \sum_{n=1}^N \frac{y_n}{x_n} $$
+    Thus, we see that both expressions are equivalent.
+    
+    \item Granted that we derived our optimal formula for $w*$ without specifying $p(x,y)$ and that we used unbiased estimates for our expectation moments,  we are not assuming that $x$ and $y$ are jointly Gaussian.
+\end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 4
@@ -356,7 +453,34 @@ Which of the three bases (a, c, d) provided the "best" fit? \textbf{Choose one},
 Given the quality of this fit, do you believe that the number of sunspots controls the number of Republicans in the senate (Yes or No)?
 \end{enumerate}
 \end{framed}
-
+\newpage
+\textbf{Problem 4.}
+\begin{enumerate}
+    \item 
+    \\
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=\textwidth]{HW1/ps1-p4-repub-years - Copy.png}
+        \caption{Number Republicans in Congress vs Year}
+    \end{figure}
+    Sum of Squared Error for Basis A:  $392.9$ \\
+    Sum of Squared Error for Basis B:  $57.5$ \\
+    Sum of Squared Error for Basis C:  $1037.2$ \\
+    Sum of Squared Error for Basis D:  $51.9$ \\
+    
+    
+    \item 
+    \\
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=\textwidth]{HW1/ps1-p4-repub-sunspots.png}
+        \caption{Number Republicans in Congress vs Number of Sunspots}
+    \end{figure}
+    Sum of Squared Error for Basis A:  $354.8$ \\
+    Sum of Squared Error for Basis C:  $368.5$ \\
+    Sum of Squared Error for Basis D:  $862.6$ \\
+    It appears that Basis A has the best fit, since this regression has the lowest loss. However, the regression does not seem correctly predict the training data correctly for most instances and does not seem generalizable. Thus, this model does not seem to accurately predict how the number of sunspots controls the number of republicans, and therefore I don't believe that the number of sunspots controls the number of republicans in the Senate.
+\end{enumerate}
 
 
 \newpage
@@ -364,11 +488,11 @@ Given the quality of this fit, do you believe that the number of sunspots contro
 % Name and Calibration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Name}
-
+Arnav Srivastava
 \subsection*{Collaborators and Resources}
-Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+Chinmay Deshpande
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)? 
+15 hours
 
 \end{document}
