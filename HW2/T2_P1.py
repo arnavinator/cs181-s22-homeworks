@@ -136,14 +136,14 @@ if __name__ == "__main__":
     runs = 10000  # number of update steps for gradient descent
     N = 30      # size of dataset
 
-    # all_models1 = []
-    # for _ in range(10):
-    #     x, y = generate_data(N)
-    #     x_transformed1 = basis1(x)
-    #     model = LogisticRegressor(eta=eta, runs=runs)   # initialize Logitistic Regressor
-    #     model.fit(x_transformed1, y)
-    #     all_models1.append(model)
-    # visualize_prediction_lines(x, y, all_models1, basis1, "Basis 1")
+    all_models1 = []
+    for _ in range(10):
+        x, y = generate_data(N)
+        x_transformed1 = basis1(x)
+        model = LogisticRegressor(eta=eta, runs=runs)   # initialize Logitistic Regressor
+        model.fit(x_transformed1, y)
+        all_models1.append(model)
+    visualize_prediction_lines(x, y, all_models1, basis1, "Basis 1")
 
     all_models2 = []
     for _ in range(10):
