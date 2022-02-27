@@ -122,12 +122,11 @@ class LogisticRegression:
         # we need to actually do plt in this function
         # make some tracking mechanism as the algo progresses
         plt.figure()
-        print(len(self.loss_index))
-        print(len(self.loss))
         plt.scatter(self.loss_index, self.loss, alpha=0.5)
         plt.title(output_file)
+        print(self.lam)
+        print(self.eta)
         plt.xlabel('Number of Iterations')
         plt.ylabel('NegativeLog-Likelihood  Loss')
-
         if show_charts:
             plt.show()

@@ -15,8 +15,8 @@ from T2_P3_KNNModel import KNNModel
 # adjust these as you try to find the best fit for each classifier.
 
 # Logistic Regression hyperparameters
-eta = 0.1 # Learning rate
-lam = 0.1 # Lambda for regularization
+eta = 0.001 # Learning rate
+lam = 0.001 # Lambda for regularization
 
 # Whether or not you want the plots to be displayed
 show_charts = True
@@ -95,11 +95,11 @@ lr = LogisticRegression(eta=eta, lam=lam)
 lr.fit(X, y)
 lr.visualize_loss('logistic_regression_loss', show_charts=show_charts)
 visualize_boundary(lr, X, y, 'logistic_regression_result')
-
+#
 # knn1 = KNNModel(k=1)
 # knn1.fit(X, y)
 # visualize_boundary(knn1, X, y, 'knn1_result')
-
+#
 # knn3 = KNNModel(k=3)
 # knn3.fit(X, y)
 # visualize_boundary(knn3, X, y, 'knn3_result')
@@ -107,7 +107,7 @@ visualize_boundary(lr, X, y, 'logistic_regression_result')
 # knn5 = KNNModel(k=5)
 # knn5.fit(X, y)
 # visualize_boundary(knn5, X, y, 'knn5_result')
-#
+
 
 # Setting up some sample data
 X_test = np.array([[6, 2]])
