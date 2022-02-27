@@ -19,13 +19,13 @@ from scipy.special import expit as sigmoid
 def basis1(x):
     return np.stack([np.ones(len(x)), x], axis=1)
 
-# TODO: Implement this
-def basis2(x):
-    return None
 
-# TODO: Implement this
+def basis2(x):
+    return np.stack([np.ones(len(x)), x, np.power(x, 2)], axis=1)
+
+
 def basis3(x):
-    return None
+    return np.stack([np.ones(len(x)), x, np.power(x,2), np.power(x,3), np.power(x,4), np.power(x,5)], axis=1)
 
 class LogisticRegressor:
     def __init__(self, eta, runs):
@@ -37,17 +37,42 @@ class LogisticRegressor:
     def __dummyPrivateMethod(self, input):
         return None
 
-    # TODO: Optimize w using gradient descent
+    # Optimize w using gradient descent
     def fit(self, x, y, w_init=None):
-        # Keep this if case for the autograder
+        # if a w_init is not given, initialize!
+        # else, use our w_init that is given
         if w_init is not None:
             self.W = w_init
         else:
-            self.W = np.random.rand(x.shape[1], 1)
+            # given x is Nx2 mat (ex basis1), then we want w to be 2x1 mat
+            # then, wT * x can be expressed as np.dot(x, w) to get result of Nx1 matrix
+            # which represents the logistic probability for each input elem of x
+            self.W = np.random.rand(x.shape[1], 1)  # randomize a set of arrays of the right size
 
-    # TODO: Fix this method!
+        self.gradientDescent(x, y)
+
+    # perform gradient descent
+    def gradientDescent(self, x, y):
+        for i in range(0, self.runs):
+            self.W = self.W - self.eta*np.dot(x.T, self.grad_predict(x) - y) / x.shape[0]
+
+    def grad_predict(self, x):
+        return (1 / (1 + np.exp(-(np.dot(x, self.W)))))  # this is a Nx1 matrix
+
+    # given some weights, predict if y is 0 or 1 given input x
     def predict(self, x):
-        return np.dot(x, self.W)
+        res = (1 / (1 + np.exp(-(np.dot(x, self.W)))))  # this is a Nx1 matrix
+        # output = []
+        # # use probabilities to make predictions
+        # for p in res:
+        #     if p >= 0.5:
+        #         output.append(1)
+        #     else:
+        #         output.append(0)
+        # return np.array(output)
+
+        # we want to output probability, not actual classification guess, for this problem
+        return res
 
 # Function to visualize prediction lines
 # Takes as input last_x, last_y, [list of models], basis function, title
@@ -98,7 +123,7 @@ def generate_data(dataset_size):
     for _ in range(dataset_size):
         x_i = 6 * np.random.random() - 3
         p_i = np.sin(1.2*x_i) * 0.4 + 0.5
-        y_i = np.random.binomial(1, p_i)
+        y_i = np.random.binomial(1, p_i)  # biomial distrib... y_i = 1 w.p. p_i, else y_i = 0
         x.append(x_i)
         y.append(y_i)
     return np.array(x), np.array(y).reshape(-1, 1)
@@ -107,19 +132,34 @@ if __name__ == "__main__":
     
     # DO NOT CHANGE THE SEED!
     np.random.seed(1738)
-    eta = 0.001
-    runs = 10000
-    N = 30
+    eta = 0.001   #
+    runs = 10000  # number of update steps for gradient descent
+    N = 30      # size of dataset
 
-    # TODO: Make plot for each basis with all 10 models on each plot
+    # all_models1 = []
+    # for _ in range(10):
+    #     x, y = generate_data(N)
+    #     x_transformed1 = basis1(x)
+    #     model = LogisticRegressor(eta=eta, runs=runs)   # initialize Logitistic Regressor
+    #     model.fit(x_transformed1, y)
+    #     all_models1.append(model)
+    # visualize_prediction_lines(x, y, all_models1, basis1, "Basis 1")
 
-    # For example:
-    all_models = []
+    all_models2 = []
     for _ in range(10):
         x, y = generate_data(N)
-        x_transformed = basis1(x)
-        model = LogisticRegressor(eta=eta, runs=runs)
-        model.fit(x_transformed, y)
-        all_models.append(model)
-    # Here x and y contain last dataset:
-    visualize_prediction_lines(x, y, all_models, basis1, "exampleplot")
+        x_transformed2 = basis2(x)
+        model = LogisticRegressor(eta=eta, runs=runs)  # initialize Logitistic Regressor
+        model.fit(x_transformed2, y)
+        all_models2.append(model)
+    visualize_prediction_lines(x, y, all_models2, basis2, "Basis 2")
+
+    all_models3 = []
+    for _ in range(10):
+        x, y = generate_data(N)
+        x_transformed3 = basis3(x)
+        model = LogisticRegressor(eta=eta, runs=runs)  # initialize Logitistic Regressor
+        model.fit(x_transformed3, y)
+        all_models3.append(model)
+    visualize_prediction_lines(x, y, all_models3, basis3, "Basis 3")
+

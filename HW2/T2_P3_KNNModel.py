@@ -8,7 +8,7 @@ import numpy as np
 
 class KNNModel:
     def __init__(self, k):
-        self.X = None
+        self.x = None
         self.y = None
         self.K = k
 
@@ -16,20 +16,47 @@ class KNNModel:
     def __dummyPrivateMethod(self, input):
         return None
 
-    # TODO: Implement this method!
-    def predict(self, X_pred):
-        # The code in this method should be removed and replaced! We included it
-        # just so that the distribution code is runnable and produces a
-        # (currently meaningless) visualization.
-        preds = []
-        for x in X_pred:
-            z = np.cos(x ** 2).sum()
-            preds.append(1 + np.sign(z) * (np.abs(z) > 0.3))
-        return np.array(preds)
+    def predict(self, x):
+        y_out = []
+        for star in x:
+            # find k nearest inputs to x
+            # first, calculate dist between x and all data
+            dist = []
+            for i in range(0, len(self.y)):
+                # store dist between star and training data, and output label
+                dist.append([self.dist(star, self.x[i]), self.y[i]])
+
+            # sort from smallest to largest dist, include top k, and predict
+            nearest = 0
+            y_votes = []
+            while (nearest < self.K):
+                min = dist[0]
+                # find smallest distance in list
+                for elem in dist:
+                    if min[0] >= elem[0]:
+                        min = elem
+                # append the label of this mimimum, and remove from dist
+                y_votes.append(min[1])
+                dist.remove(min)
+                nearest += 1
+
+            # now take majority vote to decide label
+            if y_votes.count(0) > y_votes.count(1) and y_votes.count(0) > y_votes.count(2):
+                y_out.append(0)
+            elif y_votes.count(1) > y_votes.count(0) and y_votes.count(1) > y_votes.count(2):
+                y_out.append(1)
+            else:
+                y_out.append(2)
+
+        return np.array(y_out)
+
+    # distance between two stars, where a,b are (mag,temp) pairs
+    def dist(self, a, b):
+        return (((a[0] - b[0])/3)**2 + (a[1] - b[1])**2)
 
     # In KNN, "fitting" can be as simple as storing the data, so this has been written for you
     # If you'd like to add some preprocessing here without changing the inputs, feel free,
     # but it is completely optional.
-    def fit(self, X, y):
-        self.X = X
+    def fit(self, x, y):
+        self.x = x
         self.y = y
