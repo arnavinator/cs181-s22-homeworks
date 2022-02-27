@@ -156,7 +156,10 @@ Moreover, each plot also displays 1 of the randomly generated datasets and highl
 \newpage
 
 \subsection*{Solution}
-
+\begin{enumerate}
+    \item Completed.
+    \item Plots are below 
+\end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -235,7 +238,92 @@ $\boldX^{-\top} := (\boldX^{\top})^{-1}$
 
 
 \subsection*{Solution}
-
+\begin{enumerate}
+    \item Given our input dataset, let $y_{i,k}$ denote the $k^{th}$ element of output vector $y_i$. We know that $y_{i,k} \in \{0, 1\}$ since $y_i$ is one-hot encoded, such that we only multiply unique terms to our product when 
+    \begin{align}
+        p(D; \pi) &= \prod_{i=1}^n p(y_i) \ p(x_i | y_i)  = \prod_{i=1}^n \prod_{k=1}^K (\pi_k \ p(x_i | y_i = C_k))^{y_{i,k}} \\
+        \ln(p(D; \pi)) &= \ln(\prod_{i=1}^n \prod_{k=1}^K (\pi_k \ p(x_i | y_i = C_k))^{y_{i,k}}) \\
+        &= \sum_{i=1}^n \sum_{k=1}^K (y_{i,k}\ln(\pi_k) + y_{i,k}\ln(p(x_i | y_i = C_k))
+    \end{align}
+    
+    \item
+    Let $g(\pi_k) = \sum_k \pi_k - 1$. We want to use our Langrange multipliers framework to optimize 
+    \begin{align}
+        L(\pi_k, \lambda) &= \ln(p(D; \pi) + \lambda g(\pi_k) \\
+        &= \sum_{i=1}^n \sum_{k=1}^K (y_{i,k}\ln(\pi_k) + y_{i,k}\ln(p(x_i | y_i = C_k)) + \lambda \sum_{k=1}^K \pi_k - 1
+    \end{align}
+     It follows that
+     \begin{align}
+         \frac{\partial L}{\partial\pi_k}&= \sum_{i=1}^n \frac{y_{i,k}}{\pi_k} + \lambda = 0 \\
+         &\implies  \pi_k = \frac{-1}{\lambda}\sum_{i=1}^N y_{i,k} =  \frac{-z_k}{\lambda}
+     \end{align}
+     where $z_k$ is the total sum of data points for which our corresponding label is class $k$.
+     \begin{align}
+         \frac{\partial L}{\partial\lambda}&= \sum_{k=1}^K \pi_k - 1 = 0 \\
+         &\implies  \sum_{k=1}^K \pi_k = 1
+     \end{align}
+     Substituting in our two derivatives, we find that
+     \begin{align}
+         \sum_{k=1}^K \pi_k = \sum_{k=1}^K \frac{-z_k}{\lambda} = 1 \implies \lambda = -\sum_{k=1}^K z_k = -n
+     \end{align}
+     since the sum of $z_k$ over all $k$ classes implies that we have covered all possible data points. We can now substitute this value for $\lambda$ to find our MLE for $\pi_k$:
+     $$\hat\pi_k = \frac{z_k}{n}$$
+     This answer is intuitive since the number of datapoints which are assigned to each class divided by the total number of datapoints is a logical way to form our class prior estimation, since we have no reason to believe that test data will be biased for/against some class as opposed to our training data. 
+     \item Let input vectors $x_i \in \reals^P$, such that $$p(x_i | y_i = C_k) = \mathcal{N}(x_i |  \mu_k, \Sigma) = \frac{1}{(2\pi)^{\frac{P}{2}}|\Sigma|^\frac{1}{2}}\exp(-\frac{1}{2}(x_i- \mu_k)^T\Sigma^{-1}(x_i-\mu_k))$$
+     Then, observe that
+     \begin{align}
+         \nabla_{\mu_k}\ln(p(D;\pi)) &= \nabla_{\mu_k}(\sum_{i=1}^n \sum_{k=1}^K (y_{i,k}\ln(\pi_k) + y_{i,k}\ln(\frac{1}{(2\pi)^{\frac{P}{2}}|\Sigma|^\frac{1}{2}}\exp(-\frac{1}{2}(x_i- \mu_k)^T\Sigma^{-1}(x_i-\mu_k)))) \\
+         &= \nabla_{\mu_k}(\sum_{i=1}^n \sum_{k=1}^K (y_{i,k}\ln(\pi_k) + y_{i,k}\ln(\frac{1}{(2\pi)^{\frac{P}{2}}|\Sigma|^\frac{1}{2}}) + y_{i,k}(-\frac{1}{2}(x_i- \mu_k)^T\Sigma^{-1}(x_i-\mu_k))) \\
+         &= \sum_{i=1}^n\frac{-y_{i,k}}{2} \frac{\partial (x_i- \mu_k)^T\Sigma^{-1}(x_i-\mu_k)}{\partial \mu_k}
+     \end{align}
+     We can use property (85) in the ``Matrix Cookbook" to differentiate above. This requires that $\Sigma^{-1}$ be symmetric, ie $\Sigma^{-1} = \Sigma^{-T}$. \\
+     \textbf{Aside: } 
+     \begin{itemize}
+         \item Since $Cov(A,B) = E[(A-E[A])(B-E[B])] =  E[(B-E[B])(A-E[A])] = Cov(B,A)$, we see that $\Sigma$ is symmetric ($\Sigma = \Sigma^T$).
+         \item Next, we need to prove that if square invertible matrix $A = A^T$, then $A^{-T} = A^{-1}$. \\
+         \textit{Proof: } Let square invertible matrix $A = A^T$. Then, multiply by $A^-1$ on the right sides, then transpose both sides, and then multiplying by $A^-1$ on the right sides again.
+         \begin{align}
+             A A^{-1} &= A^T A^{-1} \\
+             I &= A^T A^{-1} \\
+            \implies I^T &= (A^T A^{-1})^T \\
+             I &= A^{-T} A \\
+             \implies I A^{-1} &= A^{-T} A A^{-1} \\
+             A^{-1} &= A^{-T}
+         \end{align}
+         It follows that since $\Sigma$ is symmetric, then $\Sigma^{-1}$ is also symmetric. 
+     \end{itemize}
+     This allows us to use property (85) in the ``Matrix Cookbook" to differentiate above. Then,
+     \begin{align}
+         \nabla_{\mu_k}\ln(p(D;\pi)) &= \sum_{i=1}^n\frac{-y_{i,k}}{2} 2 \Sigma^{-1}(x_i - \mu_k) = -\sum_{i=1}^ny_{i,k} \Sigma^{-1}(x_i - \mu_k)
+     \end{align}
+     \item 
+     \begin{align}
+         -\sum_{i=1}^n y_{i,k} \Sigma^{-1}(x_i - \mu_k) &= 0 \\
+         \implies \sum_{i=1}^n y_{i,k} \Sigma^{-1} (x_i) &= \sum_{i=1}^n y_{i,k} \Sigma^{-1} (\mu_k) \\
+         \implies \hat\mu_k &= \frac{\sum_{i=1}^N y_{i,k}x_i}{\sum_{i=1}^N y_{i,k}} =  \frac{\sum_{i=1}^N y_{i,k}x_i}{z_k}
+     \end{align}
+     where $z_k$ (as previously defined) is the total sum of data points out of $n$ for which our corresponding label is class $k$. \\
+     This MLE is equal to the average of all data points assigned to class $k$, which is an intuitive way to describe the mean of a Gaussian distribution!
+     \item 
+     \begin{align}
+         \nabla_{\Sigma}\ln(p(D;\pi)) &= \nabla_{\Sigma}(\sum_{i=1}^n \sum_{k=1}^K (y_{i,k}\ln(\pi_k) + y_{i,k}\ln(\frac{1}{(2\pi)^{\frac{P}{2}}|\Sigma|^\frac{1}{2}}\exp(-\frac{1}{2}(x_i- \mu_k)^T\Sigma^{-1}(x_i-\mu_k)))) \\
+         &= \nabla_{\Sigma}(\sum_{i=1}^n \sum_{k=1}^K (y_{i,k}\ln(\pi_k) + y_{i,k}\ln(\frac{1}{(2\pi)^{\frac{P}{2}}})- \frac{y_{i,k}}{2}\ln(|\Sigma|) - \frac{y_{i,k}}{2}(x_i- \mu_k)^T\Sigma^{-1}(x_i-\mu_k)) \\
+     \end{align}
+     Using the given Cookbook formulas at the bottom of the problem 2's page, it follows that 
+     \begin{align}
+         \nabla_{\Sigma}\ln(p(D;\pi)) &= \sum_{i=1}^n \sum_{k=1}^K -\frac{y_{i,k}}{2}\Sigma^{-T} + \frac{y_{i,k}}{2}\Sigma^{-T}(x_i-\mu_k)(x_i-\mu_k)^T\Sigma^{-T} \\
+         &= -\frac{N}{2} \Sigma^{-T} + \sum_{i=1}^n \sum_{k=1}^K \frac{y_{i,k}}{2}\Sigma^{-T}(x_i-\mu_k)(x_i-\mu_k)^T\Sigma^{-T}
+     \end{align}
+     where $n$ is the total number of input-output pairs.
+     \item Observe that we can multiply our for $\nabla_{\Sigma}\ln(p(D;\pi))$ by $\Sigma^T$ on both left-hand sides and by $\Sigma^T$ on both right hand sides and left hand sides. 
+     \begin{align}
+         &-\Sigma^T \frac{n}{2} \Sigma^{-T} \Sigma^T + \sum_{i=1}^n \sum_{k=1}^K \frac{y_{i,k}}{2}\Sigma^T\Sigma^{-T}(x_n - \mu_k)(x_n-\mu_k)^T\Sigma^{-T}\Sigma^T = 0 \\
+         &\implies \frac{n}{2} \Sigma^T = \sum_{i=1}^n \sum_{k=1}^K \frac{y_{i,k}}{2}(x_n - \mu_k)(x_n-\mu_k)^T \\
+        &\implies \Sigma^T = \frac{1}{n} \sum_{i=1}^n \sum_{k=1}^K y_{i,k}(x_n - \mu_k)(x_n-\mu_k)^T
+     \end{align}
+     Since $\Sigma^T = \Sigma$ by definition of symmetry, we see that
+     $$\hat\Sigma = \frac{1}{n} \sum_{i=1}^n \sum_{k=1}^K y_{i,k}(x_n - \mu_k)(x_n-\mu_k)^T$$
+\end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
