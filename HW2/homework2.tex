@@ -159,7 +159,30 @@ Moreover, each plot also displays 1 of the randomly generated datasets and highl
 \begin{enumerate}
     \item Completed.
     \item Plots are below 
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{HW2/Basis 1.png}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{HW2/Basis 2.png}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{HW2/Basis 3.png}
+    \end{figure}
+    \\ \\ \\ 
+    \item We see that in basis $\phi_1$, our mean of learned models as well as our model learned from the displayed dataset has the highest bias but the lowest variance compared to the other bases. \\
+    In basis $\phi_2$, our mean of learned models has even lower variance than that of $\phi_2$ and a slightly lower bias as well than that of $\phi_1$, while the same comparision holds for the model learned from the displayed dataset. We see that while model learned from the displayed dataset is very close to the mean of models for basis $\phi_1$, in basis $\phi_2$ our displayed model has greater bias as opposed to the mean of models. \\
+    Finally, in basis $\phi_3$, our mean of learned models has a much lower bias compared to $\phi_1$ and $\phi_2$ while consequently having a much larger variance than $\phi_1$ or $\phi_2$. We also see that the same comparision holds for the model learned from the displayed dataset as opposed to those of $\phi_1$ and $\phi_2$, and that our model learned from the displayed dataset in $\phi_3$ matches the mean model fairly closely (but still has higher bias and variance as compared to the mean). \\
+    Altogether, we see that $\phi_3$ best models the ground truth process, while $\phi_2$ is the second best and $\phi_1$ is the worst. 
+    
+    \item If we were to increase the size of each dataset, each model would be trained on more data and would get a better representation of the ground truth function. Thus, for individual models of all bases, I would expect the variance to increase and expect bias to decrease since they are able to better model the ground truth data (with greater sensitivity in these metrics for $\phi_2$ and $\phi_3$ since these basis are more promisingly able to model the ground truth process given that we provide the model more features). \\
+    However, I do not think variance or bias would change after we average our models to get the mean of learned models. By taking the average of 10 models, our overall model has been able to learn from a good representation of the ground truth process (being effectively trained on 300 data points ranging from -3 to 3). While our induvidual models more accurately model the ground truth process, each model is now closer to mean of learned models (and there is less diversity from one model to the next for the same basis). Therefore, I think that increasing the data individual models see would not change the bias or variance of the mean of learned models.
+
 \end{enumerate}
+
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
