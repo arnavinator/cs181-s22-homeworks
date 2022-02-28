@@ -455,6 +455,42 @@ values in \texttt{T2\_P3.py} for logistic regression.
 
 
 \subsection*{Solution}
+\begin{enumerate}
+    \item Plots are dispersed below
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW2/logistic_regression_result.png}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW2/generative_result_shared_covariances.png}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW2/generative_result_separate_covariances.png}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW2/knn1_result.png}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW2/knn3_result.png}
+    \end{figure}
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW2/knn5_result.png}
+    \end{figure}
+    \newpage
+    \newpage
+    \newpage \\ \\ \\ \\ 
+    Comparing all of our classifiers, we see that logistic regression had the highest bias. In particular, we see that almost all Dwarf stars from our training data would be misclassified. This error could be accounted to the fact that the weights for each star class were developed independently, but when using our softmax approach, the class which had the highest probability was used to decide the boundary output. So although our logistic function for the dwarf star class could predict with a high probability that the training dwarf stars are in fact dwarf stars, other logistic functions which are more confident in their prediction can overule the prediction of dwarf stars. \\
+    Meanwhile, our generative result and knn results were much better at accurately confirming the classes to which our test data belonged to. \\
+    For the generative result with shared covariances, we see that linear boundaries between classes, whereas for separate covariances we see curved boundaries which fit more tightly to each class. This makes sense, since the covariance matrix describes the shape of our multivariate Gaussian distribution. If we assume that there is a separate covariance for each class when ``generating" our inputs, our multivariate gaussian will have biased insight into how our data is generated and our class boundary will be closely shaped near our training data for each class. Meanwhile, a shared covariance considers a more holistic view of how data is generated. \\
+    Finally, for our knn result, we see that our decision boundaries are fairly nonlinear, since they are decided based off of the closest neighbors based on our distance function. Given that our distance function weights temperature more heavily than magnitude, we see that as the number of neighbors we consider increases, our boundaries become more vertical (since temperature is on the vertical axis in our plots). \\
+    Altogether, we see that for regions where there is little data, based on whether considering probablistic interpretations to classification or nearest neighbors, our classifiers seem to extrapolate differently. For instance, logistic regression and shared covariance generative classification predicts that large magnitude and high temperature stars are ''Giants" whereas the other models predict that these stars are ``Dwarfs."
+    
+\end{enumerate}
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -466,7 +502,8 @@ values in \texttt{T2\_P3.py} for logistic regression.
 Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)?
+Approximately how long did this homework take you to complete (in hours)? \\
+25 hours
 
 
 
