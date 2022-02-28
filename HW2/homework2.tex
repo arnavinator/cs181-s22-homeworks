@@ -484,11 +484,20 @@ values in \texttt{T2\_P3.py} for logistic regression.
     \newpage
     \newpage
     \newpage \\ \\ \\ \\ 
-    Comparing all of our classifiers, we see that logistic regression had the highest bias. In particular, we see that almost all Dwarf stars from our training data would be misclassified. This error could be accounted to the fact that the weights for each star class were developed independently, but when using our softmax approach, the class which had the highest probability was used to decide the boundary output. So although our logistic function for the dwarf star class could predict with a high probability that the training dwarf stars are in fact dwarf stars, other logistic functions which are more confident in their prediction can overule the prediction of dwarf stars. \\
-    Meanwhile, our generative result and knn results were much better at accurately confirming the classes to which our test data belonged to. \\
+    Comparing all of our classifiers, we see that logistic regression had the highest misclassification of training data (where 3 Dwarf stars would be classified as Supergiant). This error could be accounted to the fact that the weights for each star class were developed independently, but when using our softmax approach, the class which had the highest probability was used to decide the boundary output. So although our logistic function for the dwarf star class could predict with a high probability that the training dwarf stars are in fact dwarf stars, other logistic functions which are more confident in their prediction can overule the prediction of dwarf stars. \\
+    Meanwhile, our generative result and knn results were better at accurately confirming the classes to which our test data belonged to. \\
     For the generative result with shared covariances, we see that linear boundaries between classes, whereas for separate covariances we see curved boundaries which fit more tightly to each class. This makes sense, since the covariance matrix describes the shape of our multivariate Gaussian distribution. If we assume that there is a separate covariance for each class when ``generating" our inputs, our multivariate gaussian will have biased insight into how our data is generated and our class boundary will be closely shaped near our training data for each class. Meanwhile, a shared covariance considers a more holistic view of how data is generated. \\
     Finally, for our knn result, we see that our decision boundaries are fairly nonlinear, since they are decided based off of the closest neighbors based on our distance function. Given that our distance function weights temperature more heavily than magnitude, we see that as the number of neighbors we consider increases, our boundaries become more vertical (since temperature is on the vertical axis in our plots). \\
     Altogether, we see that for regions where there is little data, based on whether considering probablistic interpretations to classification or nearest neighbors, our classifiers seem to extrapolate differently. For instance, logistic regression and shared covariance generative classification predicts that large magnitude and high temperature stars are ''Giants" whereas the other models predict that these stars are ``Dwarfs."
+    
+    \item After trying values for $\eta = 000.1, 0.01, 0.05$ and $\lambda = 0.001, 0.01, 0.05$, I have found that my final choices for learning rate and regularization strength are $\eta = 0.01$ and $\lambda = 0.01$. These are reasonable parameters because they lead to minimizing the loss the fastest out of the 9 plots while still driving the loss to zero. Furthermore, a relatively large $\lambda$ ensures that our weights are not too large, whereas a relatively large $\eta$ values ensures that we converge to minimize our loss quickly. \\
+    \begin{figure} [h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW2/knn5_result.png}
+    \end{figure}
+
+    As $\eta$ increases, our gradient descent can more aggressively work towards minimizing loss and converging to some zero value. This means a faster rate of convergence and minizing the loss towards $0$ as much as we can. \\
+    Meanwhile, as $\lambda$ increases, our rate of convergence also increases in most settings. Since we limit weights from being too large, so long as our gradient descent can minimize this new loss-regularization gradient term, 
     
 \end{enumerate}
 
