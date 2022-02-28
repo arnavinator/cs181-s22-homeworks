@@ -23,6 +23,8 @@ class LogisticRegression:
 
     # we need weights for each class (3 sets of weights)
     def fit(self, x, y, w_init=None):
+        # add a bias of 1s to x
+        x = np.concatenate((np.ones(x.shape[0]).reshape(x.shape[0], 1), x), axis=1)
         # given x is Nx2 mat, then we want wT to be 2x1 mat
         # then, wT * x can be expressed as np.dot(x, w) to get result of Nx1 matrix
         # which represents the logistic probability for each input elem of x
@@ -100,6 +102,8 @@ class LogisticRegression:
     # 'Giant': 1,       # also corresponds to 'blue' in the graphs
     # 'Supergiant': 2   # also corresponds to 'green' in the graphs
     def predict(self, x):
+        # add bias term once again
+        x = np.concatenate((np.ones(x.shape[0]).reshape(x.shape[0],1), x), axis=1)
         res1 = np.exp(np.dot(x, self.W1))  # this is a Nx1 matrix
         res2 = np.exp(np.dot(x, self.W2))
         res3 = np.exp(np.dot(x, self.W3))
@@ -124,8 +128,6 @@ class LogisticRegression:
         plt.figure()
         plt.scatter(self.loss_index, self.loss, alpha=0.5)
         plt.title(output_file)
-        print(self.lam)
-        print(self.eta)
         plt.xlabel('Number of Iterations')
         plt.ylabel('NegativeLog-Likelihood  Loss')
         if show_charts:

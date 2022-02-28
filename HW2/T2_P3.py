@@ -79,34 +79,34 @@ X = df[['Magnitude', 'Temperature']].values
 y = np.array([star_labels[x] for x in df['Type']])
 
 # Setting up and evaluating a number of different classification models
-# nb1 = GaussianGenerativeModel(is_shared_covariance=False)
-# nb1.fit(X, y)
-# visualize_boundary(nb1, X, y, 'generative_result_separate_covariances')
-# print('Separate Covariance negative log-likelihood: {}\n'
-#       .format(nb1.negative_log_likelihood(X, y)))
-#
-# nb2 = GaussianGenerativeModel(is_shared_covariance=True)
-# nb2.fit(X, y)
-# visualize_boundary(nb2, X, y, 'generative_result_shared_covariances')
-# print('Shared Covariance negative log-likelihood: {}\n'
-#       .format(nb2.negative_log_likelihood(X, y)))
+nb1 = GaussianGenerativeModel(is_shared_covariance=False)
+nb1.fit(X, y)
+visualize_boundary(nb1, X, y, 'generative_result_separate_covariances')
+print('Separate Covariance negative log-likelihood: {}\n'
+      .format(nb1.negative_log_likelihood(X, y)))
+
+nb2 = GaussianGenerativeModel(is_shared_covariance=True)
+nb2.fit(X, y)
+visualize_boundary(nb2, X, y, 'generative_result_shared_covariances')
+print('Shared Covariance negative log-likelihood: {}\n'
+      .format(nb2.negative_log_likelihood(X, y)))
 
 lr = LogisticRegression(eta=eta, lam=lam)
 lr.fit(X, y)
 lr.visualize_loss('logistic_regression_loss', show_charts=show_charts)
 visualize_boundary(lr, X, y, 'logistic_regression_result')
 #
-# knn1 = KNNModel(k=1)
-# knn1.fit(X, y)
-# visualize_boundary(knn1, X, y, 'knn1_result')
-#
-# knn3 = KNNModel(k=3)
-# knn3.fit(X, y)
-# visualize_boundary(knn3, X, y, 'knn3_result')
-#
-# knn5 = KNNModel(k=5)
-# knn5.fit(X, y)
-# visualize_boundary(knn5, X, y, 'knn5_result')
+knn1 = KNNModel(k=1)
+knn1.fit(X, y)
+visualize_boundary(knn1, X, y, 'knn1_result')
+
+knn3 = KNNModel(k=3)
+knn3.fit(X, y)
+visualize_boundary(knn3, X, y, 'knn3_result')
+
+knn5 = KNNModel(k=5)
+knn5.fit(X, y)
+visualize_boundary(knn5, X, y, 'knn5_result')
 
 
 # Setting up some sample data
