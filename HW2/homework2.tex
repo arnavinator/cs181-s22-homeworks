@@ -177,7 +177,7 @@ Moreover, each plot also displays 1 of the randomly generated datasets and highl
     Finally, in basis $\phi_3$, our mean of learned models has a much lower bias compared to $\phi_1$ and $\phi_2$ while consequently having a much larger variance than $\phi_1$ or $\phi_2$. We also see that the same comparision holds for the model learned from the displayed dataset as opposed to those of $\phi_1$ and $\phi_2$, and that our model learned from the displayed dataset in $\phi_3$ matches the mean model fairly closely (but still has higher bias and variance as compared to the mean). \\
     Altogether, we see that $\phi_3$ best models the ground truth process, while $\phi_2$ is the second best and $\phi_1$ is the worst. 
     
-    \item If we were to increase the size of each dataset, each model would be trained on more data and would get a better representation of the ground truth function. Thus, for individual models of all bases, I would expect the variance to increase and expect bias to decrease since they are able to better model the ground truth data (with greater sensitivity in these metrics for $\phi_2$ and $\phi_3$ since these basis are more promisingly able to model the ground truth process given that we provide the model more features). \\
+    \item If we were to increase the size of each dataset, each model would be trained on more data and would get a better representation of the ground truth function. Thus, for individual models of all bases, I would expect the variance to decrease and expect bias to decrease since they are able to better model the ground truth process. \\
     However, I do not think variance or bias would change after we average our models to get the mean of learned models. By taking the average of 10 models, our overall model has been able to learn from a good representation of the ground truth process (being effectively trained on 300 data points ranging from -3 to 3). While our induvidual models more accurately model the ground truth process, each model is now closer to mean of learned models (and there is less diversity from one model to the next for the same basis). Therefore, I think that increasing the data individual models see would not change the bias or variance of the mean of learned models.
 
 \end{enumerate}
@@ -278,7 +278,7 @@ $\boldX^{-\top} := (\boldX^{\top})^{-1}$
      It follows that
      \begin{align}
          \frac{\partial L}{\partial\pi_k}&= \sum_{i=1}^n \frac{y_{i,k}}{\pi_k} + \lambda = 0 \\
-         &\implies  \pi_k = \frac{-1}{\lambda}\sum_{i=1}^N y_{i,k} =  \frac{-z_k}{\lambda}
+         &\implies  \pi_k = \frac{-1}{\lambda}\sum_{i=1}^n y_{i,k} =  \frac{-z_k}{\lambda}
      \end{align}
      where $z_k$ is the total sum of data points for which our corresponding label is class $k$.
      \begin{align}
@@ -484,9 +484,9 @@ values in \texttt{T2\_P3.py} for logistic regression.
     \newpage
     \newpage
     \newpage \\ \\ \\ \\ 
-    Comparing all of our classifiers, we see that logistic regression had the highest misclassification of training data (where 3 Dwarf stars would be classified as Supergiant). This error could be accounted to the fact that the weights for each star class were developed independently, but when using our softmax approach, the class which had the highest probability was used to decide the boundary output. So although our logistic function for the dwarf star class could predict with a high probability that the training dwarf stars are in fact dwarf stars, other logistic functions which are more confident in their prediction can overule the prediction of dwarf stars. \\
-    Meanwhile, our generative result and knn results were better at accurately confirming the classes to which our test data belonged to. \\
-    For the generative result with shared covariances, we see that linear boundaries between classes, whereas for separate covariances we see curved boundaries which fit more tightly to each class. This makes sense, since the covariance matrix describes the shape of our multivariate Gaussian distribution. If we assume that there is a separate covariance for each class when ``generating" our inputs, our multivariate gaussian will have biased insight into how our data is generated and our class boundary will be closely shaped near our training data for each class. Meanwhile, a shared covariance considers a more holistic view of how data is generated. \\
+    
+    For the generative result with shared covariances and softmax, we see that linear boundaries between classes, whereas for separate covariances we see curved boundaries which fit more tightly to each class. \\
+    This makes sense for the softmax regression, since it is a multi-dimensional implementation of linear regression. If we assume that there is a separate covariance matrix (which describes the shape of our multivariate Gaussian distribution) for each class when ``generating" our inputs, our multivariate gaussian will have biased insight into how our data is generated and our class boundary will be closely shaped near our training data for each class. Meanwhile, a shared covariance considers a more holistic view of how data is generated, and this common covariance leads to linear boundaries. \\
     Finally, for our knn result, we see that our decision boundaries are fairly nonlinear, since they are decided based off of the closest neighbors based on our distance function. Given that our distance function weights temperature more heavily than magnitude, we see that as the number of neighbors we consider increases, our boundaries become more vertical (since temperature is on the vertical axis in our plots). \\
     Altogether, we see that for regions where there is little data, based on whether considering probablistic interpretations to classification or nearest neighbors, our classifiers seem to extrapolate differently. For instance, logistic regression and shared covariance generative classification predicts that large magnitude and high temperature stars are ''Giants" whereas the other models predict that these stars are ``Dwarfs."
     \begin{figure} [h!]
@@ -508,22 +508,12 @@ values in \texttt{T2\_P3.py} for logistic regression.
     \begin{itemize}
         \item Separate Covariance Gaussian Model: 0 
         \item Shared Covariance Gaussian Model: 1
-        \item Linear Regression: 1
+        \item Softmax: 1
         \item KNN Model with k=1: 0
         \item KNN Model with k=3: 0
         \item KNN Model with k=5: 0
     \end{itemize}
-    
-
-Test star type predictions for 
-
-Test star type predictions for 
-Test star type predictions for 
-Test star type predictions for
-Test star type predictions for 
-
-
-    
+    The classifiers can give some insights into how much we should trust them. For instance, for KNN, the more neighbors that are the same as the label, the greater our confidence in our prediction (this approach doesn't work if $k=1$). Meanwhile, we can look at how high the probability of the Softmax prediction for the chosen class is relative to the other class predicted probabilities for confidence in this classifier: the higher the prediction probability relative to others, the greater our confidence in the classifier's prediction. Finally, we can look at how the probability of the Gaussian classifiers for the chosen class is relative to the other class predicted probabilities for confidence in this classifier: the higher the prediction probability relative to others, the greater our confidence in the classifier's prediction. 
     
 \end{enumerate}
 
