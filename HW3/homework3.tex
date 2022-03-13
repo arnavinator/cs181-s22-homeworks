@@ -135,7 +135,67 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
   \end{problem}
 
 \subsection*{Solution:}
+\begin{enumerate}
+    \item To derive $p(\mu | D)$, we use Bayes' rule and drop terms which do not depend on $\mu$
+    \begin{align}
+        p(\mu | D) &\propto p(D| \mu) p(\mu | \mu) = \mathcal{N}(\mu,  \sigma^2) \mathcal{N}(0, \tau^2) \\
+        &= \frac{1}{\sigma\tau \sqrt{2 \pi}} e^{\frac{-\mu^2}{2\tau^2}} \prod_{x_i \in D} e^\frac{-(x_i - \mu)^2}{2\sigma^2} \\
+        & \propto e^{\frac{-\mu^2}{2\tau^2}} \prod_{x_i \in D} e^\frac{-(\mu^2 - 2x_i \mu)}{2\sigma^2} \\
+        &= \prod_{x_i \in D} e^{\frac{-1}{2}{(\frac{\mu^2}{\tau^2} + \frac{\mu^2 - 2x_i \mu}{\sigma^2}})} \\
+        &= \prod_{x_i \in D} e^{\frac{-1}{2\tau^2 \sigma^2}(\tau^2 \mu^2  + \sigma^2 \mu^2 - 2\tau^2 x_i\mu))}
+    \end{align}
+    Bringing our product into a summation within the exponential, we have
+    \begin{align}
+        p(\mu | D) &= e^{\frac{-1}{2\tau^2 \sigma^2}(\tau^2 \mu^2  + \sum_{i=1}^n(\sigma^2 \mu^2 - 2\tau^2 x_i\mu))} \\
+        &= e^{\frac{-1}{2\tau^2 \sigma^2}((\tau^2 + n \sigma^2)\mu^2 - (2\tau^2 \sum_{i=1}^n x_i)\mu)} \\
+        &= e^{\frac{-(\tau^2 + n \sigma^2)}{2\tau^2 \sigma^2}(\mu^2 - (\frac{2\tau^2 \sum_{i=1}^n x_i}{(\tau^2 + n \sigma^2)})\mu)}
+    \end{align}
+    By completing the square and dropping the term which does not depend on $\mu$, we get that 
+    \begin{align}
+        p(\mu | D) &= e^{\frac{-(\tau^2 + n \sigma^2)}{2\tau^2 \sigma^2}((\mu - \frac{\tau^2 \sum_{i=1}^n x_i}{(\tau^2 + n \sigma^2)})^2 - \frac{\tau^2 \sum_{i=1}^n x_i}{(\tau^2 + n \sigma^2)})} \\
+        &\propto e^{\frac{-(\tau^2 + n \sigma^2)}{2\tau^2 \sigma^2}(\mu - \frac{\tau^2 \sum_{i=1}^n x_i}{(\tau^2 + n \sigma^2)})^2} \\
+        & \implies \mu | D \sim \mathcal{N}(\frac{\tau^2 \sum_{i=1}^n x_i}{\tau^2 + n \sigma^2}, \frac{\tau^2 \sigma^2}{\tau^2 + n\sigma^2})
+    \end{align}
+    
+    \item 
+    \begin{enumerate}
+        \item For our MLE estimate, we need to find $p(D | \mu*)$. Given that $x \sim \mu* + \epsilon$, it follows that 
+        \begin{align}
+            p(D | \mu*) &= \mathcal{N}(\mu*, \sigma^2) = \prod_{x_i \in D} \frac{1}{\sigma \sqrt{2 \pi}} e^{\frac{-(x_i - \mu*)^2}{2\sigma^2}} \\
+            & \implies ln(p(D | \mu*) = \sum_{i=1}^n ln(\frac{1}{\sigma \sqrt{2 \pi}}) - \frac{(x_i - \mu*)^2}{2\sigma^2} \\
+            & \implies \nabla_{\mu*} ln(p(D | \mu*) = \sum_{i=1}^n \frac{1}{2\sigma^2}(x_i - \mu*) (-2) = 0 \\
+            &\implies \mu_{MLE} = \frac{1}{n}\sum_{i=1}^n x_i
+        \end{align}
+        \item For our MAP estimate, we need to find $p(\mu* | D) \propto p(D|\mu*) p(\mu*)$. It folows that 
+        \begin{align}
+            ln(p(\mu* | D)) &\propto ln(p(D| \mu*)) + ln(p(\mu*)) \\
+            & = (\sum_{i=1}^n ln(\frac{1}{\sigma \sqrt{2 \pi}} - \frac{1}{2\sigma^2}(x_i - \mu*)^2) + ln(\frac{1}{\tau \sqrt{2 \pi}}) - \frac{1}{2\tau^2}\mu*^2 \\
+                &\implies \nabla_{\mu*}ln(p(D|\mu*)) = (\sum_{i=1}^n \frac{-1}{2\sigma^2} (x_i - \mu*)(-2)) - \frac{1}{2\tau^2}2\mu* \\
+                &= \frac{1}{\sigma^2} \sum_{i=1}^n (x_i - \mu*) - \frac{1}{\tau^2}\mu* =  \frac{1}{\sigma^2} \sum_{i=1}^n x_i - (\frac{n}{\sigma^2} + \frac{1}{\tau^2})\mu* = 0 \\
+                &\implies \mu_{MAP} = \frac{1}{(n + \frac{\sigma^2}{\tau^2})} \sum_{i=1}^n x_i
+        \end{align}
+        \item They are the same! Our answer above matches the mean of $x|D$ exactly! 
+        \item Given $ x \sim \mu* + \epsilon$, it follows that
+        \begin{align}
+            x | \mu* &\sim \mathcal{N}(\mu*, \sigma^2) \\
+            x|\mu_{MLE} &\sim  \mathcal{N}(\frac{1}{n} \sum_{i=1}^n x_i, \sigma^2)\\
+            x| \mu_{MAP} &\sim \mathcal{N}(\frac{1}{(n + \frac{\sigma^2}{\tau^2})} \sum_{i=1}^n x_i, \sigma^2)
+        \end{align}
+        
+        \item The variance of $x | D$ is greater than the variance of $x | \mu_{MLE}$, since $(\frac{n}{\sigma^2} + \frac{1}{\tau^2})^{-1} + \sigma^2 > \sigma^2 \implies (\frac{n}{\sigma^2} + \frac{1}{\tau^2})^{-1} > 0$. \\
+        As $n$ tends towards infinity, the $(\frac{n}{\sigma^2} + \frac{1}{\tau^2})^{-1}$ converges to $0$ such that the variance of $x | D$ converges to $\sigma^2$. \\
+        Intuitively, we see that as we observe more input data points and $n$ grows larger, our variance of $x | D$ converges towards that of $x | \mu_{MLE}$ since more data points better sample our distribution which models our point estimate of $\mu_{MLE}$ (whereas less datapoints do not sample this distribution as closely, leading to $x |D$ having a larger variance when $n$ is not large).
+        
+    \end{enumerate}
+    \item  We use the expressions for $\mu_{MAP}$ and $\mu_{MLE}$ derived in question 2.
+    \begin{enumerate} \\
+        \item $ \mu_{MLE} = \mu_{MAP} = 0 $
+        \item Since $\frac{1}{n} > \frac{1}{n + \frac{\sigma^2}{\tau^2}}$, it follows that $\mu_{MAP}$ is more positive, ie $\mu_{MAP} > \mu_{MLE}$. 
+        \item  Since $\frac{1}{n} > \frac{1}{n + \frac{\sigma^2}{\tau^2}}$, it follows that $-\frac{1}{n} < -\frac{1}{n + \frac{\sigma^2}{\tau^2}}$, such that $\mu_{MLE}$ is less negative, ie  $\mu_{MAP} < \mu_{MLE}$
+    \end{enumerate}
+    \item $\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}} = \lim_{n \rightarrow \infty} \frac{\frac{1}{n}\sum_{x_i \in D}}{\frac{1}{n + \frac{\sigma^2}{\tau^2}}\sum_{x_i \in D}} = \lim_{n \rightarrow \infty} \frac{n + \frac{\sigma^2}{\tau^2}}{n} = 1$ 
 
+\end{enumerate}
 
 \newpage
 
@@ -169,7 +229,24 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
 \end{problem}
 
 \subsection*{Solution:}
-
+\begin{enumerate}
+    \item 
+    \begin{align}
+        p(w | X,y) &\propto p(w)p(y|X, w) = \frac{1}{2\tau}e^{-\frac{\|{w}-{\mu}\|_1}{\tau}} \frac{1}{\sqrt{(2 \pi)^{N/2}}|\Sigma|^{\frac{1}{2}}} e^{\frac{-1}{2}(y - Xw)^T \Sigma^{-1} (y-Xw)} 
+    \end{align}
+    where $\Sigma^{-1} = \frac{1}{\Sigma^2}I$ 
+    \item 
+    \begin{align}
+        w_{MAP} &= argmax_w \ p(w| X,y) = argmax_w ln(p(w)) + ln(p(y|X, w)) \\
+        &= argmax_w \ ln(\frac{1}{2\tau}) -\frac{\|{w}-{\mu}\|_1}{\tau} + ln(\frac{1}{\sqrt{(2 \pi)^{N/2}}|\Sigma|^{\frac{1}{2}}}) - \frac{1}{2}(y - Xw)^T \Sigma^{-1} (y-Xw) \\
+         &= argmax_w \ -\frac{\|{w}-{\mu}\|_1}{\tau}  - \frac{1}{2}(y - Xw)^T \Sigma^{-1} (y-Xw) 
+    \end{align}
+    We see that as $\tau$ increases, we reduce emphasis on keeping $w$ close to $\mu$. This is analogous to regularization where as $\lambda$ increases, we minimize the magnitude of our weights and make them come close to $0$. In particular, the scaling by $\tau$ is very similar to Lasso regularization, except instead of driving weights to zero we are driving them to $\mu$. 
+    \item Similar to regularization seen above, one way we could make $w$ close to $v$ is to use $\frac{\|{w}-{v}\|_1}{\alpha}$, where the a smaller $\alpha$ places emphasis on make $w$ be closer to $v$. Then, we would have $$w_{MAP} =  argmax_w \ \frac{\|{w}-{v}\|_1}{\alpha} +  -\frac{\|{w}-{\mu}\|_1}{\tau}  - \frac{1}{2}(y - Xw)^T \Sigma^{-1} (y-Xw) $$. \\
+    Since Bayesian models begin with prior beliefs, and then update their model as they observe data, incorporating this expert knowledge makes sense since it is an instantiation of incorporating prior beliefs into our model weights. \\
+    Meanwhile, although Frequentist models do not introduce priors, this expert knowledge is instead interpreted as a penalization term intended to reduce model complexity/bias.
+    \item As $\tau$ decreases, the emphasis on making $w_{MAP}$ close to $\mu$ increases and the magnitude of each weight comes closer to magnitude of each component of $\mu$. As $\tau \to 0$, $w_{MAP} \to \mu$. 
+\end{enumerate}
 
 \newpage
 % FDV: We had a lot of debate about this problem, whether it's useful
@@ -227,6 +304,41 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
     \end{problem}
 
 \subsection*{Solution:}
+\begin{enumerate}
+    \item 
+    \begin{itemize}
+        \item $x \in R^{Mx N} $
+        \item $W_1 \in R^{HxM} $
+        \item $b_1 \in R^{HxN}$
+        \item $a_1 \in R^{HxN}$
+        \item $z_1 \in R^{HxN}$
+        \item $W_2 \in R^{1xH}$
+        \item $b_2 \in R^{1xN}$
+        \item $a_2 \in R^{1xN}$
+        \item $z_2 \in R^{1xN}$
+    \end{itemize}
+    
+    \item
+    \begin{enumerate}
+        \item 
+        \begin{align}
+            \frac{\partial L}{\partial b_2} &= \frac{\partial L}{\partial \hat y}\frac{\partial \hat y}{\partial a_2} \frac{\partial a_2}{\partial b_2} = [-(\frac{y}{\hat y} + \frac{y-1}{1-\hat y})] \ [\hat y (1 - \hat y)] \ [1] = y(\hat y - 1) + \hat y (1 - y)
+        \end{align}
+        \item 
+        \begin{align}
+            \frac{\partial L}{\partial W_2^h} &= [\frac{\partial L}{\partial \hat y}\frac{\partial \hat y}{\partial a_2}] \frac{\partial a_2}{\partial W_2^h} = [y(\hat y - 1) + \hat y (1 - y)] \ z_1^h
+        \end{align}
+        \item
+        \begin{align}
+            \frac{\partial L}{\partial b_1^h} &= [\frac{\partial L}{\partial \hat y}\frac{\partial \hat y}{\partial a_2} ] \frac{\partial a_2}{\partial z_1^h} \frac{\partial z_1^h}{\partial a_1^h} \frac{\partial a_1^h }{\partial b_1^h} = [y(\hat y - 1) + \hat y (1 - y)] \ [w_2^h] \ [z_1^h (1 - z_1^h)] \ [1] \\
+            &= [y(\hat y - 1) + \hat y (1 - y)] \ [w_2^h] \ [z_1^h (1 - z_1^h)]
+        \end{align}
+        \item 
+        \begin{align}
+            \frac{\partial L}{\partial W_1^{h,m}} &= [\frac{\partial L}{\partial \hat y}\frac{\partial \hat y}{\partial a_2}  \frac{\partial a_2}{\partial z_1^h} \frac{\partial z_1^h}{\partial a_1^h}] \frac{\partial a_1^h }{\partial W_1^{h,m}} = [y(\hat y - 1) + \hat y (1 - y)] \ [w_2^h] \ [z_1^h (1 - z_1^h)] \ [x^m]
+        \end{align}
+    \end{enumerate}
+\end{enumerate}
 
 
 
@@ -250,45 +362,70 @@ Plot:
 Code:
 
 \begin{python}
-n_inputs = 'not implemented'
-n_hiddens = 'not implemented'
-n_outputs = 'not implemented'
+# given a single image (M=1)
+n_inputs = 28*28  # D
+n_hiddens = 256  # J
+n_outputs = 10     # number of possible labels
 
-W1 = 'not implemented'
-b1 = 'not implemented'
-W2 = 'not implemented'
-b2 = 'not implemented'
+W1 = torch.nn.Parameter(torch.randn(size=(n_inputs, n_hiddens)))
+b1 = torch.nn.Parameter(torch.randn(size=(1, n_hiddens)))
+W2 = torch.nn.Parameter(torch.randn(size=(n_hiddens, n_outputs)))
+b2 = torch.nn.Parameter(torch.randn(size=(1, n_outputs)))
+
+# needed to prevent initial weights being too large.. nan errors
+with torch.no_grad():
+    W1 *= 0.01
+    W2 *= 0.01
+    
+params = [W1, b1, W2, b2]
 
 
 
 def relu(x):
-    'not implemented'
+    return torch.clamp(x, min=0)
+
+def softmax(X):
+    # unsqueeze puts denominator on axis and divides, preserves tensor allowing for summation and division
+    return torch.div(torch.exp(X), torch.sum(torch.exp(X), dim=1).unsqueeze(1))
 
 
-
-def softmax(x):
-    'not implemented'
-
-
-
+# forward pass net(X) expects X to be a batch of FashionMNIST, hence the shape (batch_size, 1, 28, 28).
 def net(X):
-  'not implemented'
-
+    # flatten first image of batch
+    x = torch.flatten(X[0]).reshape(1,-1)
+    # for remaining images in the batch, flatten and stack together
+    for i in range(1, X.shape[0]):
+        x = torch.cat([x, torch.flatten(X[i]).reshape(1,-1)], axis=0)
+        
+    H = relu(x @ W1 + b1)
+    O = softmax(H @ W2 + b2)
+    
+    return O
 
 
 def cross_entropy(y_hat, y):
-  'not implemented'
-
-
+    mesh = torch.gather(y_hat, 1, y.unsqueeze(1))   # gather values along first dimension so that we can take the log
+    return -1 * torch.log(mesh)
 
 def sgd(params, lr=0.1):
-  'not implemented'
+    with torch.no_grad():
+        for i in range(0, len(params)):
+            # note that x = x-1 is not the same as x -= 1... later modifies same tensor, 
+            # while first makes new tensor and throws error!
+            params[i] -= lr * params[i].grad
+        # have to zero out gradients once all backpropogation is complete, not before
+        for i in range(0, len(params)):
+            params[i].grad.zero_()
 
 
-
+# modelled based off of training code
 def train(net, params, train_iter, loss_func=cross_entropy, updater=sgd):
-  'not implemented'
-
+    for _ in tqdm(range(epochs)):
+        for X, y in train_iter:
+            y_hat = net(X)
+            loss = loss_func(y_hat, y).mean()
+            loss.backward()
+            updater(params)
 \end{python}
 
 
