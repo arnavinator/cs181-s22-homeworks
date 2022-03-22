@@ -262,7 +262,7 @@ $\boldX^{-\top} := (\boldX^{\top})^{-1}$
 
 \subsection*{Solution}
 \begin{enumerate}
-    \item Given our input dataset, let $y_{i,k}$ denote the $k^{th}$ element of output vector $y_i$. We know that $y_{i,k} \in \{0, 1\}$ since $y_i$ is one-hot encoded, such that we only multiply unique terms to our product when 
+    \item Given our input dataset, let $y_{i,k}$ denote the $k^{th}$ element of output vector $y_i$. We know that $y_{i,k} \in \{0, 1\}$ since $y_i$ is one-hot encoded, such that we only multiply unique terms to our product when  $y_{i,k}=1$
     \begin{align}
         p(D; \pi) &= \prod_{i=1}^n p(y_i) \ p(x_i | y_i)  = \prod_{i=1}^n \prod_{k=1}^K (\pi_k \ p(x_i | y_i = C_k))^{y_{i,k}} \\
         \ln(p(D; \pi)) &= \ln(\prod_{i=1}^n \prod_{k=1}^K (\pi_k \ p(x_i | y_i = C_k))^{y_{i,k}}) \\
