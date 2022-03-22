@@ -138,7 +138,7 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
 \begin{enumerate}
     \item To derive $p(\mu | D)$, we use Bayes' rule and drop terms which do not depend on $\mu$
     \begin{align}
-        p(\mu | D) &\propto p(D| \mu) p(\mu | \mu) = \mathcal{N}(\mu,  \sigma^2) \mathcal{N}(0, \tau^2) \\
+        p(\mu | D) &\propto p(D| \mu) p(\mu) = \mathcal{N}(\mu,  \sigma^2) \mathcal{N}(0, \tau^2) \\
         &= \frac{1}{\sigma\tau \sqrt{2 \pi}} e^{\frac{-\mu^2}{2\tau^2}} \prod_{x_i \in D} e^\frac{-(x_i - \mu)^2}{2\sigma^2} \\
         & \propto e^{\frac{-\mu^2}{2\tau^2}} \prod_{x_i \in D} e^\frac{-(\mu^2 - 2x_i \mu)}{2\sigma^2} \\
         &= \prod_{x_i \in D} e^{\frac{-1}{2}{(\frac{\mu^2}{\tau^2} + \frac{\mu^2 - 2x_i \mu}{\sigma^2}})} \\
@@ -357,7 +357,7 @@ $$\lim_{n \rightarrow \infty} \frac{\mu_{MAP}}{\mu_{MLE}}$$
 \subsection*{Solution:}
 Plot:
 
-% \includegraphics[width=\linewidth]{final_plot}
+\includegraphics[width=\linewidth]{final_plot}
 
 Code:
 
@@ -434,12 +434,14 @@ def train(net, params, train_iter, loss_func=cross_entropy, updater=sgd):
 % Name and Calibration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Name}
+Arnav Srivastava
 
 \subsection*{Collaborators and Resources}
-Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+Collaborated with Chinmay Deshpande and Jeremy Zhang. \\
+Resource: https://stackoverflow.com/questions/57237352/what-does-unsqueeze-do-in-pytorch
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)? 
-
+Approximately how long did this homework take you to complete (in hours)? \\
+20
 
 \end{document}
