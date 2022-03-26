@@ -115,7 +115,31 @@ the questions below when composing your answers, and to justify each step.
 
 \subsection*{Solution}
 
-
+\begin{enumerate}
+    \item \begin{figure}
+        \centering
+        \includegraphics[height=0.4\textheight]{}
+    \end{figure}
+    
+    \item The margin has value of 1.
+    \item One unit vector which is orthogonal to the decision boundary is $[\phi(x)_1, \phi(x)_2] = [0, 1]$. 
+    \item By inspection, we find that the optimal decision boundary is given by $\phi(x)_2 = -1 \implies \phi(x)_2 + 1 = 0$. \\
+    Given the decision boundary form $w^T \phi(x) + w_0 = 0$, it follows that one valid optimal decision boundary is given as $w = [0, 1], w_0 = 1$. \\
+    Since scaling $w^T \phi(x) + w_0 = 0$ by some constant will not change our optimal decision boundary, it follows that we can treat $w_0$ itself as our scaling parameter of $w$. \\
+    Therefore, all possible parameters describing the optimal decision boundary is given by $w = [0, w_0]$ for $w_0 \in \reals$
+    \item Given $y_i(w^T\phi(x_i) + w_0) \geq 1$, we see that the optimal value is given by $w = [0,1]$. 
+    \item The corresponding optimal value is $w_0 = 1$. \\
+    The discriminant function is then $h(\phi(x); w, w_0)  = [0, 1]^T\phi(x) + 1 = \phi(x)_2 + 1 = - \frac{8}{3}x^2 + \frac{2}{3}x^4 + 1$
+    \item For hard margin, support vectors satisfy $y_i h(\phi(x_i); w, w_0) = 1$. It follows that our support vectors are as follows (given in the form $(x_i, y_i)$):
+    \begin{itemize}
+        \item $(-2,1) \implies (1)h(\phi(-2); w, w_0) = 1(0+1) = 1$
+        \item $(-1,-1) \implies (-1)h(\phi(-1); w, w_0) = -1(-2+1) = 1$
+        \item $(0,1) \implies (1)h(\phi(0); w, w_0) = 1(0+1) = 1$
+        \item $(1,-1) \implies (-1)h(\phi(1); w, w_0) = -1(-2+1) = 1$
+        \item $(2,1) \implies (1)h(\phi(2); w, w_0) = 1(0+1) = 1$
+    \end{itemize}
+    \item Observe that 
+\end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
