@@ -114,7 +114,8 @@ class HAC(object):
                 for elem in link_tracker:
                     if smallest_link[0] < elem[0]:
                         smallest_link = elem
-
+                print(X.shape)
+                print(smallest_link)
                 # we have now found the smallest min_link out of images, ie closest clusters by our linkage criteria
                 # merge into one cluster, append this to X, and remove induvidual clusters from X
                 merged = np.vstack((X[smallest_link[1]], X[smallest_link[2]]))
@@ -139,7 +140,7 @@ class HAC(object):
                 for i in range(0, len(X) - 1):
                     link = self.max_link(X[i], X[-1])
                     link_tracker.append([link, i, len(X)-1])
-
+                print(X)
 
         elif self.linkage == 'min':
             while (cluster_count > 10):
