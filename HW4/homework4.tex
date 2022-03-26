@@ -116,9 +116,22 @@ the questions below when composing your answers, and to justify each step.
 \subsection*{Solution}
 
 \begin{enumerate}
-    \item \begin{figure}
+    \item 
+    We have the following $(\phi(x)_1, \phi(x)_2)$ pairs:
+    \begin{itemize}
+        \item (-3, 30)
+        \item (-2, 0)
+        \item (-1,-2)
+        \item (0,0) 
+        \item(1, -2) 
+        \item (2,0) 
+         \item (3, 30)
+    \end{itemize}
+    In the plot below, I have shown the optimal decision boundary (in light blue) based off of these points set at $\phi(x)_2 = -1$. The yellow points represent the class $y = 1$ and the dark blue points represent the points $y = -1$.
+    
+    \begin{figure}
         \centering
-        \includegraphics[height=0.4\textheight]{}
+        \includegraphics[height=0.4\textheight]{HW4/P1part1plot.png}
     \end{figure}
     
     \item The margin has value of 1.
@@ -138,7 +151,23 @@ the questions below when composing your answers, and to justify each step.
         \item $(1,-1) \implies (-1)h(\phi(1); w, w_0) = -1(-2+1) = 1$
         \item $(2,1) \implies (1)h(\phi(2); w, w_0) = 1(0+1) = 1$
     \end{itemize}
-    \item Observe that 
+    \item  We have the following $(\phi'(x)_1, \phi'(x)_2)$ pairs:
+    \begin{itemize}
+        \item (-3, 24)
+        \item (-2, -1)
+        \item (-1,-2)
+        \item (0,0) 
+        \item(1, -2) 
+        \item (2,-1) 
+         \item (3, 24)
+    \end{itemize}
+    In the plot below, I have shown the optimal decision boundary (in light blue) based off of these points set at $\phi(x)_2 = -1.5$. The yellow points represent the class $y = 1$ and the dark blue points represent the points $y = -1$. \\
+    We see that this feature mapping still admits a separable solution. However, our margin is now $0.5$, whereas our previous feature mapping had a margin of $1$. Based on this, we would prefer the the first set of feature mappings $phi$ over this new feature mapping $\phi'$. Given that our hard margin classifier is constrained by $y_i (w^T \phi(x_i) + w_0 \geq 1$, it follows that our current training framework will not be able to works optimally towards defining the boundary which perfectly separates our classes using $\phi'$ because we constrain our margin to be larger than the margin which our optimal boundary allows for. Meanwhile, using $\phi$, our margin is equal to the margin for the optimal boundary, so our training framework will be able to work towards optimally finding our ideal decision boundary.
+
+    \begin{figure}
+        \centering
+        \includegraphics{}
+    \end{figure}
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 2
