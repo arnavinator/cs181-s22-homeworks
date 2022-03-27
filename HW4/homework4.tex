@@ -166,7 +166,7 @@ the questions below when composing your answers, and to justify each step.
 
     \begin{figure}
         \centering
-        \includegraphics{}
+        \includegraphics{HW4/P1part8plot.png}
     \end{figure}
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -301,19 +301,42 @@ Draw a causal chain that resulted in this outcome and circle the choice points t
 \end{problem}
 
 \subsection*{Solution}
+I chose to select the outcome ``An NLP algorithm filled in the inference “Man is to as woman is to ” with “Man is to computer programmer as woman is to homemaker” (Bolukbasi et al, 2016)." \\
+Below is my causal chain. I have written two alternative decisions at each morally relevant choice point.
+\begin{enumerate}
+    \item Google News articles are chosen as input corpus for W2V (word to vector, ie the NLP algorithm of discussion).
+    \begin{itemize}
+        \item Pre-screen what kind of news articles are chosen. Ensure that no gender-biased news articles are used nor that any gender-biased quotes are referenced in the articles. This would help ensure that the media is working in a 
+    \end{itemize}
+    \item Words from the news article are turned into vectors by Skip-Gram, an unsupervised learning method where context words are predicted from the target word. We take a two-layer neural network, and encode words from the news article as one-hot vectors of length 300. The rows of the hidden layer weight matrix operates as a look up table for, whose rows are the word vectors (word embeddings) we desire.
+    \begin{itemize}
+        \item Increase the size of the vector which encodes our vocabulary! Increasing the number of dimensions could allow for the algorithm to have more leeway in determining similarity between input encoded words, and the algorithm could be more specific.  
+    \end{itemize}
+    \item W2V has similar computed word embeddings (from the hidden layer) for these words to be similar, encompassing similarity between vectors ranging from semantic to syntactic patterns. Cosine vector similarity is used to determine similarity between 
+    \begin{itemize}
+        \item We should have a framework where there is more cases for the 
+    \end{itemize}
 
+\end{enumerate}
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Name and Calibration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Name}
-
+Arnav Srivastava
 \subsection*{Collaborators and Resources}
 Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?\\
+No partners.
 \\
+Resources:
+\begin{itemize}
+    \item https://code.google.com/archive/p/word2vec/
+    \item https://arxiv.org/pdf/1607.06520.pdf
+    \item https://israelg99.github.io/2017-03-23-Word2Vec-Explained/
+\end{itemize}
 Did you attend office hours for help with this homework?
-
+No.
 \subsection*{Calibration}
 Approximately how long did this homework take you to complete (in hours)? 
-
+20
 \end{document}
