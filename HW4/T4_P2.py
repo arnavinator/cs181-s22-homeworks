@@ -98,24 +98,22 @@ class HAC(object):
     def fit(self, X):
         cluster_count = X.shape[0]
         X = list(X)   # will have different sized rows, so we need a list of 1d np arrays as opposed to 2d np array
+
         if self.linkage == 'max':
             link_tracker = []  # list of [dist, clusterIndex1, clusterIndex2]
             # note that linkage between cluster i and j is same as j and i
             for i in range(0, len(X) - 1):
                 for j in range(i + 1, len(X)):
-                    # min link between c_i and c_j is dist btwn FARTHEST PIX IN C_I AND FARTHEST PIX IN C_J
+                    # link between c_i and c_j is dist btwn FARTHEST IM IN C_I AND FARTHEST IM IN C_J
                     link = self.max_link(X[i], X[j])
                     link_tracker.append([link, i, j])
 
             while(cluster_count > 10):
-                print(cluster_count)
                 # pick lowest linkage in link_tracker
                 smallest_link = link_tracker[0]
                 for elem in link_tracker:
-                    if smallest_link[0] < elem[0]:
+                    if smallest_link[0] > elem[0]:
                         smallest_link = elem
-                print(X.shape)
-                print(smallest_link)
                 # we have now found the smallest min_link out of images, ie closest clusters by our linkage criteria
                 # merge into one cluster, append this to X, and remove induvidual clusters from X
                 merged = np.vstack((X[smallest_link[1]], X[smallest_link[2]]))
@@ -125,90 +123,135 @@ class HAC(object):
                 cluster_count -= 1
 
                 # update link_tracker
-                for elem in link_tracker:
-                    # remove all min linkage which involves the clusters we just merged
-                    if elem[1] == smallest_link[1] or elem[2] == smallest_link[2]:
-                        link_tracker.remove(elem)
+                del_index = []
+                for i in range(0, len(link_tracker)):
+                    # track which list item to remove.... remove all which involves the clusters we just merged
+                    if link_tracker[i][1] == smallest_link[1] or link_tracker[i][2] == smallest_link[2] or link_tracker[i][1] == smallest_link[2] or link_tracker[i][2] == smallest_link[1]:
+                        del_index.append(i)
                     else:
                         # since we just removed two clusters from X, we need to shift our cluster references
-                        # back by 1 if the cluster referenced in link tracking was indexed after the cluster removed
-                        if elem[1] > smallest_link[1]:
-                            elem[1] -= 1
-                        if elem[2] > smallest_link[2]:
-                            elem[2] -= 1
+                        # back if the cluster referenced in link tracking was indexed after the cluster removed
+                        if link_tracker[i][1] > smallest_link[1] and link_tracker[i][1] > smallest_link[2]:
+                            link_tracker[i][1] -= 2
+                        elif link_tracker[i][1] > smallest_link[1] or link_tracker[i][1] > smallest_link[2]:
+                            link_tracker[i][1] -= 1
+
+                        if link_tracker[i][2] > smallest_link[1] and link_tracker[i][2] > smallest_link[2]:
+                            link_tracker[i][2] -= 2
+                        elif link_tracker[i][2] > smallest_link[1] or link_tracker[i][2] > smallest_link[2]:
+                            link_tracker[i][2] -= 1
+                shift = 0
+                for elem in del_index:
+                    del link_tracker[elem - shift]  # remove the elem we wanted to remove
+                    shift += 1   # now that link_tracker is one elem less, our next inteded index has shifted by 1
+
                 # now, compute new linkage between new merged cluster (last index) and existing clusters
                 for i in range(0, len(X) - 1):
                     link = self.max_link(X[i], X[-1])
                     link_tracker.append([link, i, len(X)-1])
-                print(X)
+
 
         elif self.linkage == 'min':
-            while (cluster_count > 10):
-                # tracker for closest cluster to every cluster (mean image)
-                min_link_tracker = []  # array of (dist, cluster1, cluster2)
-                for i in range(0, X.shape[0]):
-                    # find min linkage for cluster i
-                    # we need to use cdist to compare dist between every pixel of im-i to all other pixel of im-j
-                    # doing so requires converting each im to 2d
-                    a = np.reshape(X[i], (784, 1))
-                    # initialize TOO LARGE dummy linkage value (distance between entire vectors)
-                    min_link = [255**2, 0, 1]  # (dist, cluster1, cluster2)
-                    for j in range(0, X.shape[0]):
-                        if i != j:
-                            b = np.reshape(X[j], (784, 1))
-                            # want dist between CLOSEST ELEM OF I AND CLOSEST ELEM OF J
-                            link = np.min(cdist(a, b))
-                            if link <= min_link[0]:
-                                min_link = [link, i, j]
-                    # we have now found min link for image i
-                    min_link_tracker.append(min_link)
+            link_tracker = []  # list of [dist, clusterIndex1, clusterIndex2]
+            # note that linkage between cluster i and j is same as j and i
+            for i in range(0, len(X) - 1):
+                for j in range(i + 1, len(X)):
+                    # link between c_i and c_j is dist btwn CLOSEST IM IN C_I AND CLOSEST IM IN C_J
+                    link = self.min_link(X[i], X[j])
+                    link_tracker.append([link, i, j])
 
-                # find the smallest min_link out of all
-                smallest_link = min_link_tracker[0]
-                for elem in min_link_tracker:
-                    if smallest_link[0] < elem[0]:
+            while(cluster_count > 10):
+                # pick lowest linkage in link_tracker
+                smallest_link = link_tracker[0]
+                for elem in link_tracker:
+                    if smallest_link[0] > elem[0]:
                         smallest_link = elem
-
-                # we have now found the closest clusters by our linkage criteria,
-                # average closest clusters, and remove induvidual clusters
-                avg = (X[smallest_link[1]] + X[smallest_link[2]]) / 2
-                X = np.vstack([X, avg])  # add averaged cluster to the end
-                X = np.delete(X, smallest_link[1], axis=0)
-                X = np.delete(X, smallest_link[2], axis=0)
-
+                # we have now found the smallest min_link out of images, ie closest clusters by our linkage criteria
+                # merge into one cluster, append this to X, and remove induvidual clusters from X
+                merged = np.vstack((X[smallest_link[1]], X[smallest_link[2]]))
+                X.append(merged)  # add averaged cluster to the end
+                del X[smallest_link[1]]
+                del X[smallest_link[2]]
                 cluster_count -= 1
+
+                # update link_tracker
+                del_index = []
+                for i in range(0, len(link_tracker)):
+                    # track which list item to remove.... remove all which involves the clusters we just merged
+                    if link_tracker[i][1] == smallest_link[1] or link_tracker[i][2] == smallest_link[2] or link_tracker[i][1] == smallest_link[2] or link_tracker[i][2] == smallest_link[1]:
+                        del_index.append(i)
+                    else:
+                        # since we just removed two clusters from X, we need to shift our cluster references
+                        # back if the cluster referenced in link tracking was indexed after the cluster removed
+                        if link_tracker[i][1] > smallest_link[1] and link_tracker[i][1] > smallest_link[2]:
+                            link_tracker[i][1] -= 2
+                        elif link_tracker[i][1] > smallest_link[1] or link_tracker[i][1] > smallest_link[2]:
+                            link_tracker[i][1] -= 1
+
+                        if link_tracker[i][2] > smallest_link[1] and link_tracker[i][2] > smallest_link[2]:
+                            link_tracker[i][2] -= 2
+                        elif link_tracker[i][2] > smallest_link[1] or link_tracker[i][2] > smallest_link[2]:
+                            link_tracker[i][2] -= 1
+                shift = 0
+                for elem in del_index:
+                    del link_tracker[elem - shift]  # remove the elem we wanted to remove
+                    shift += 1   # now that link_tracker is one elem less, our next inteded index has shifted by 1
+
+                # now, compute new linkage between new merged cluster (last index) and existing clusters
+                for i in range(0, len(X) - 1):
+                    link = self.min_link(X[i], X[-1])
+                    link_tracker.append([link, i, len(X)-1])
 
         elif self.linkage == 'centroid':
-            while (cluster_count > 10):
-                # tracker for closest cluster to every cluster (mean image)
-                min_link_tracker = []  # array of (dist, cluster1, cluster2)
-                for i in range(0, X.shape[0]):
-                    # find min linkage for cluster i
-                    # initialize TOO LARGE dummy linkage value
-                    min_link = [255**2, 0, 1]  # (dist, cluster1, cluster2)
-                    for j in range(0, X.shape[1]):
-                        if i != j:
-                            # want dist between CENTROID OF I AND CENTROID OF J
-                            link = np.abs(np.average(X[i]) - np.average(X[j]))
-                            if link <= min_link[0]:
-                                min_link = [link, i, j]
-                    # we have now found min link for image i
-                    min_link_tracker.append(min_link)
+            link_tracker = []  # list of [dist, clusterIndex1, clusterIndex2]
+            # note that linkage between cluster i and j is same as j and i
+            for i in range(0, len(X) - 1):
+                for j in range(i + 1, len(X)):
+                    # link between c_i and c_j is dist btwn CENTROID of C_I AND CENTROID of C_J
+                    link = self.centroid_link(X[i], X[j])
+                    link_tracker.append([link, i, j])
 
-                # find the smallest min_link out of all
-                smallest_link = min_link_tracker[0]
-                for elem in min_link_tracker:
-                    if smallest_link[0] < elem[0]:
+            while(cluster_count > 10):
+                # pick lowest linkage in link_tracker
+                smallest_link = link_tracker[0]
+                for elem in link_tracker:
+                    if smallest_link[0] > elem[0]:
                         smallest_link = elem
-
-                # we have now found the closest clusters by our linkage criteria,
-                # average closest clusters, and remove induvidual clusters
-                avg = (X[smallest_link[1]] + X[smallest_link[2]]) / 2
-                X = np.vstack([X, avg])  # add averaged cluster to the end
-                X = np.delete(X, smallest_link[1], axis=0)
-                X = np.delete(X, smallest_link[2], axis=0)
-
+                # we have now found the smallest min_link out of images, ie closest clusters by our linkage criteria
+                # merge into one cluster, append this to X, and remove induvidual clusters from X
+                merged = np.vstack((X[smallest_link[1]], X[smallest_link[2]]))
+                X.append(merged)  # add averaged cluster to the end
+                del X[smallest_link[1]]
+                del X[smallest_link[2]]
                 cluster_count -= 1
+
+                # update link_tracker
+                del_index = []
+                for i in range(0, len(link_tracker)):
+                    # track which list item to remove.... remove all which involves the clusters we just merged
+                    if link_tracker[i][1] == smallest_link[1] or link_tracker[i][2] == smallest_link[2] or link_tracker[i][1] == smallest_link[2] or link_tracker[i][2] == smallest_link[1]:
+                        del_index.append(i)
+                    else:
+                        # since we just removed two clusters from X, we need to shift our cluster references
+                        # back if the cluster referenced in link tracking was indexed after the cluster removed
+                        if link_tracker[i][1] > smallest_link[1] and link_tracker[i][1] > smallest_link[2]:
+                            link_tracker[i][1] -= 2
+                        elif link_tracker[i][1] > smallest_link[1] or link_tracker[i][1] > smallest_link[2]:
+                            link_tracker[i][1] -= 1
+
+                        if link_tracker[i][2] > smallest_link[1] and link_tracker[i][2] > smallest_link[2]:
+                            link_tracker[i][2] -= 2
+                        elif link_tracker[i][2] > smallest_link[1] or link_tracker[i][2] > smallest_link[2]:
+                            link_tracker[i][2] -= 1
+                shift = 0
+                for elem in del_index:
+                    del link_tracker[elem - shift]  # remove the elem we wanted to remove
+                    shift += 1   # now that link_tracker is one elem less, our next inteded index has shifted by 1
+
+                # now, compute new linkage between new merged cluster (last index) and existing clusters
+                for i in range(0, len(X) - 1):
+                    link = self.centroid_link(X[i], X[-1])
+                    link_tracker.append([link, i, len(X)-1])
 
         # for get_mean_images
         self.final_clusters = X  # there are only 10 clusters remaining here!
@@ -227,21 +270,34 @@ class HAC(object):
         return np.array(mean_im)
 
     def max_link(self, a, b):
-        # we need to use cdist to compare dist between every pixel of cluster a to all other pixel of cluster b
-        # first, flatten each cluster, then convert each image to 2d so that compatible with cdist
-        # if cluster a flattened has x pixels, cluster b flattened has y pixels, then after converting
-        # to 2d, cdist will yield a x by y matrix M, where M[x,y] = distance between x and y
-        if a.ndim > 1:
-            a = a.flatten()
-        if b.ndim > 1:
-            b = b.flatten()
+        # use cdist to compare distance between vectors in cluster a and vectors in cluster b
+        # if a or b are 1 dimensional, make them 2d so that cdist happy
+        if a.ndim == 1:
+            a = np.reshape(a, (1, 784))
+        if b.ndim == 1:
+            b = np.reshape(b, (1, 784))
 
-        a = np.reshape(a, (a.shape[0], 1))
-        b = np.reshape(b, (b.shape[0], 1))
-
+        # given a is 3x784 and b is 1x784, cdist[0] == dist btwn a[0] and b[0] == np.linalg.norm(a[0]-b[0])
         # return max distance between two clusters' furthest elems
         return np.max(cdist(a, b))
 
+    def min_link(self, a, b):
+        # use cdist to compare distance between vectors in cluster a and vectors in cluster b
+        # if a or b are 1 dimensional, make them 2d so that cdist happy
+        if a.ndim == 1:
+            a = np.reshape(a, (1, 784))
+        if b.ndim == 1:
+            b = np.reshape(b, (1, 784))
+
+        # given a is 3x784 and b is 1x784, cdist[0] == dist btwn a[0] and b[0] == np.linalg.norm(a[0]-b[0])
+        # return max distance between two clusters' furthest elems
+        return np.min(cdist(a, b))
+
+    def centroid_link(self, a, b):
+        centroid_a = np.sum(a, axis=0) / a.shape[0]
+        centroid_b = np.sum(b, axis=0) / b.shape[0]
+
+        return np.linalg.norm(centroid_a - centroid_b)
 
 
 # Plotting code for parts 2 and 3 (plots the centroid)
@@ -275,25 +331,24 @@ def make_mean_image_plot(data, standardized=False):
 # # ~~ Part 3 ~~
 # # mean would be the average value of the i-th pixel ACCROSS ALL DATA POINTS
 # # standardized value for the i-th pixel in a particular data point = (pixel_value - mean) / std
-# large_stdzd = np.copy(large_dataset)  # copy values, but no share same addr
+# large_stdzd = np.copy(large_dataset).astype(np.float64)  # copy values, but no share same addr
 # # iterate through every COL of dataset
 # for i in range(0, large_stdzd.shape[1]):
-#     col = large_stdzd[:,i]
 #
-#     std = np.var(col)**0.5
+#     std = np.std(large_stdzd[:,i])
 #     # divide by 1 for pixels with 0 variance
 #     if std == 0:
 #         std = 1
 #
 #     # this pixel is now standardized
-#     col = (col - np.mean(col)) / std
+#     large_stdzd[:,i] = (large_stdzd[:,i] - np.mean(large_stdzd[:,i])) / std
 #
 # make_mean_image_plot(large_stdzd, True)
 
 # Plotting code for part 4
-# LINKAGES = [ 'max', 'min', 'centroid' ]
+LINKAGES = [ 'max', 'min', 'centroid' ]
 n_clusters = 10
-LINKAGES = ['max']
+
 
 fig = plt.figure(figsize=(10,10))
 plt.suptitle("HAC mean images with max, min, and centroid linkages")
