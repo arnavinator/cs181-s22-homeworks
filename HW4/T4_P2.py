@@ -4,6 +4,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
+import seaborn as sn
+
 
 # Loading datasets for K-Means and HAC
 small_dataset = np.load("data/small_dataset.npy")
@@ -44,6 +46,9 @@ class KMeans(object):
 
         # this is for get_mean_images func
         self.mean_images = centers
+
+        # this is for part 5 (number of images per cluster)
+        self.clusters_distrib = self.assign(X, centers)  # 1 x N array (each elem 0 to K-1 to tell which cluster belong to)
         # # for part 1, plot the change in loss for each iteration
         # iters = np.arange(1, 11)
         # plt.plot(iters, iter_loss)
@@ -59,7 +64,7 @@ class KMeans(object):
             min_dist = [np.linalg.norm(X[i] - centers[0]), 0]   # initialize (min_dist, cluster_index) pair
             for j in range(0, self.K):
                 dist = np.linalg.norm(X[i] - centers[j])
-                if min_dist[0] > dist:
+                if min_dist[0] >= dist:
                     min_dist = [dist, j]
             # we have now found assignment of datapoint
             assign.append(min_dist[1])
@@ -119,7 +124,7 @@ class HAC(object):
                 merged = np.vstack((X[smallest_link[1]], X[smallest_link[2]]))
                 X.append(merged)  # add averaged cluster to the end
                 del X[smallest_link[1]]
-                del X[smallest_link[2]]
+                del X[smallest_link[2] - 1]   # account for the shift in our index since we removed an elem
                 cluster_count -= 1
 
                 # update link_tracker
@@ -171,7 +176,7 @@ class HAC(object):
                 merged = np.vstack((X[smallest_link[1]], X[smallest_link[2]]))
                 X.append(merged)  # add averaged cluster to the end
                 del X[smallest_link[1]]
-                del X[smallest_link[2]]
+                del X[smallest_link[2] - 1]   # account for the shift in our index since we removed an elem
                 cluster_count -= 1
 
                 # update link_tracker
@@ -222,7 +227,7 @@ class HAC(object):
                 merged = np.vstack((X[smallest_link[1]], X[smallest_link[2]]))
                 X.append(merged)  # add averaged cluster to the end
                 del X[smallest_link[1]]
-                del X[smallest_link[2]]
+                del X[smallest_link[2] - 1]   # account for the shift in our index since we removed an elem
                 cluster_count -= 1
 
                 # update link_tracker
@@ -324,7 +329,7 @@ def make_mean_image_plot(data, standardized=False):
             if i == 0: ax.set_ylabel('Class '+str(k), rotation=90)
             plt.imshow(allmeans[k,i].reshape(28,28), cmap='Greys_r')  # covert 784 back to 28x28 im!
     plt.show()
-#
+
 # # ~~ Part 2 ~~
 # make_mean_image_plot(large_dataset, False)
 #
@@ -345,30 +350,194 @@ def make_mean_image_plot(data, standardized=False):
 #
 # make_mean_image_plot(large_stdzd, True)
 
-# Plotting code for part 4
-LINKAGES = [ 'max', 'min', 'centroid' ]
-n_clusters = 10
+# # Plotting code for part 4
+# LINKAGES = [ 'max', 'min', 'centroid' ]
+# n_clusters = 10
+#
+#
+#
+# fig = plt.figure(figsize=(10,10))
+# plt.suptitle("HAC mean images with max, min, and centroid linkages")
+# for l_idx, l in enumerate(LINKAGES):
+#     # Fit HAC
+#     hac = HAC(l)
+#     hac.fit(small_dataset)
+#     mean_images = hac.get_mean_images(n_clusters)
+#     # Make plot
+#     for m_idx in range(mean_images.shape[0]):
+#         m = mean_images[m_idx]
+#         ax = fig.add_subplot(n_clusters, len(LINKAGES), l_idx + m_idx*len(LINKAGES) + 1)
+#         plt.setp(ax.get_xticklabels(), visible=False)
+#         plt.setp(ax.get_yticklabels(), visible=False)
+#         ax.tick_params(axis='both', which='both', length=0)
+#         if m_idx == 0: plt.title(l)
+#         if l_idx == 0: ax.set_ylabel('Class '+str(m_idx), rotation=90)
+#         plt.imshow(m.reshape(28,28), cmap='Greys_r')
+# plt.show()
 
 
-fig = plt.figure(figsize=(10,10))
-plt.suptitle("HAC mean images with max, min, and centroid linkages")
-for l_idx, l in enumerate(LINKAGES):
-    # Fit HAC
-    hac = HAC(l)
-    hac.fit(small_dataset)
-    mean_images = hac.get_mean_images(n_clusters)
-    # Make plot
-    for m_idx in range(mean_images.shape[0]):
-        m = mean_images[m_idx]
-        ax = fig.add_subplot(n_clusters, len(LINKAGES), l_idx + m_idx*len(LINKAGES) + 1)
-        plt.setp(ax.get_xticklabels(), visible=False)
-        plt.setp(ax.get_yticklabels(), visible=False)
-        ax.tick_params(axis='both', which='both', length=0)
-        if m_idx == 0: plt.title(l)
-        if l_idx == 0: ax.set_ylabel('Class '+str(m_idx), rotation=90)
-        plt.imshow(m.reshape(28,28), cmap='Greys_r')
+
+# PART 5 - number of images in cluster vs cluster index
+# find plot for Kmeans (non-standardized)
+KMeansClassifier = KMeans(K=10)
+KMeansClassifier.fit(small_dataset)
+km_cluster_distrib = KMeansClassifier.clusters_distrib
+Nk = np.zeros(10)   # track total num of datapoints in each class
+for i in range(0, small_dataset.shape[0]):
+    Nk[km_cluster_distrib[i]] += 1
+fig = plt.figure()
+plt.bar([0,1,2,3,4,5,6,7,8,9], Nk)
+plt.title('Kmeans (Non-standardized)')
+plt.ylabel('Number of images in cluster')
+plt.xlabel('Cluster index')
 plt.show()
 
-# TODO: Write plotting code for part 5
+# find plot for HAC max
+hacmax = HAC('max')
+hacmax.fit(small_dataset)
+hac_cluster_distrib = []
+for elem in hacmax.final_clusters:
+    if elem.ndim == 1:
+        hac_cluster_distrib.append(1)
+    else:
+        hac_cluster_distrib.append(elem.shape[0])
+fig = plt.figure()
+plt.bar([0,1,2,3,4,5,6,7,8,9], hac_cluster_distrib)
+plt.title('HAC (max-linkage)')
+plt.ylabel('Number of images in cluster')
+plt.xlabel('Cluster index')
+plt.show()
 
-# TODO: Write plotting code for part 6
+
+# find plot for HAC min
+hacmin = HAC('min')
+hacmin.fit(small_dataset)
+hac_cluster_distrib = []
+for elem in hacmin.final_clusters:
+    if elem.ndim == 1:
+        hac_cluster_distrib.append(1)
+    else:
+        hac_cluster_distrib.append(elem.shape[0])
+fig = plt.figure()
+plt.bar([0,1,2,3,4,5,6,7,8,9], hac_cluster_distrib)
+plt.title('HAC (min-linkage)')
+plt.ylabel('Number of images in cluster')
+plt.xlabel('Cluster index')
+plt.show()
+
+# find plot for HAC centroid
+haccen = HAC('centroid')
+haccen.fit(small_dataset)
+hac_cluster_distrib = []
+for elem in haccen.final_clusters:
+    if elem.ndim == 1:
+        hac_cluster_distrib.append(1)
+    else:
+        hac_cluster_distrib.append(elem.shape[0])
+fig = plt.figure()
+plt.bar([0,1,2,3,4,5,6,7,8,9], hac_cluster_distrib)
+plt.title('HAC (centroid-linkage)')
+plt.ylabel('Number of images in cluster')
+plt.xlabel('Cluster index')
+plt.show()
+
+
+
+# PART 6
+# create 6 heatmap for K-means and all 3 HACs confusion matrix
+# use same results from part 5
+
+# heatmap Kmeans vs HAC max
+mat = np.zeros((10,10))
+hacmax_distrib = []
+for i in range(0, 300):
+    for j in range(0, 10):
+        # find cluster j to which image i belongs
+        if np.where(np.prod(hacmax.final_clusters[j] == small_dataset[i], axis=-1))[0].size != 0:
+            hacmax_distrib.append(j)
+            break
+# create matrix which fed into heatmap
+# both km_cluster_distrib and hacmax_distrib are 1x300 arr which tell which cluster each im belongs for each method
+for i in range(0, 300):
+    mat[km_cluster_distrib[i]][hacmax_distrib[i]] += 1
+
+hm = sn.heatmap(data=mat)
+hm.set_ylabel('Kmeans Cluster Index')
+hm.set_xlabel('HAC (Max-Linkage) Cluster Index')
+plt.show()
+
+
+
+# heatmap Kmeans vs HAC min
+mat = np.zeros((10,10))
+hacmin_distrib = []
+for i in range(0, 300):
+    for j in range(0, 10):
+        # find cluster j to which image i belongs
+        if np.where(np.prod(hacmin.final_clusters[j] == small_dataset[i], axis=-1))[0].size != 0:
+            hacmin_distrib.append(j)
+            break
+# create matrix which fed into heatmap
+# both km_cluster_distrib and hacmin_distrib are 1x300 arr which tell which cluster each im belongs for each method
+for i in range(0, 300):
+    mat[km_cluster_distrib[i]][hacmin_distrib[i]] += 1
+
+hm = sn.heatmap(data=mat)
+hm.set_ylabel('Kmeans Cluster Index')
+hm.set_xlabel('HAC (Min-Linkage) Cluster Index')
+plt.show()
+
+# heatmap Kmeans vs HAC centroid
+mat = np.zeros((10,10))
+haccen_distrib = []
+for i in range(0, 300):
+    for j in range(0, 10):
+        # find cluster j to which image i belongs
+        if np.where(np.prod(haccen.final_clusters[j] == small_dataset[i], axis=-1))[0].size != 0:
+            haccen_distrib.append(j)
+            break
+# create matrix which fed into heatmap
+# both km_cluster_distrib and hacmin_distrib are 1x300 arr which tell which cluster each im belongs for each method
+for i in range(0, 300):
+    mat[km_cluster_distrib[i]][haccen_distrib[i]] += 1
+
+hm = sn.heatmap(data=mat)
+hm.set_ylabel('Kmeans Cluster Index')
+hm.set_xlabel('HAC (Centroid-Linkage) Cluster Index')
+plt.show()
+
+# heatmap HAC max vs HAC min
+mat = np.zeros((10,10))
+# create matrix which fed into heatmap
+# both km_cluster_distrib and hacmin_distrib are 1x300 arr which tell which cluster each im belongs for each method
+for i in range(0, 300):
+    mat[hacmax_distrib[i]][hacmin_distrib[i]] += 1
+
+hm = sn.heatmap(data=mat)
+hm.set_ylabel('HAC (Max-Linkage) Cluster Index')
+hm.set_xlabel('HAC (Min-Linkage) Cluster Index')
+plt.show()
+
+# heatmap HAC max vs HAC centroid
+mat = np.zeros((10,10))
+# create matrix which fed into heatmap
+# both km_cluster_distrib and hacmin_distrib are 1x300 arr which tell which cluster each im belongs for each method
+for i in range(0, 300):
+    mat[hacmax_distrib[i]][haccen_distrib[i]] += 1
+
+hm = sn.heatmap(data=mat)
+hm.set_ylabel('HAC (Max-Linkage) Cluster Index')
+hm.set_xlabel('HAC (Centroid-Linkage) Cluster Index')
+plt.show()
+
+# heatmap HAC min vs HAC centroid
+mat = np.zeros((10,10))
+# create matrix which fed into heatmap
+# both km_cluster_distrib and hacmin_distrib are 1x300 arr which tell which cluster each im belongs for each method
+for i in range(0, 300):
+    mat[hacmin_distrib[i]][haccen_distrib[i]] += 1
+
+hm = sn.heatmap(data=mat)
+hm.set_ylabel('HAC (Min-Linkage) Cluster Index')
+hm.set_xlabel('HAC (Centroid-Linkage) Cluster Index')
+plt.show()
