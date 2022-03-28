@@ -330,50 +330,50 @@ def make_mean_image_plot(data, standardized=False):
             plt.imshow(allmeans[k,i].reshape(28,28), cmap='Greys_r')  # covert 784 back to 28x28 im!
     plt.show()
 
-# # ~~ Part 2 ~~
-# make_mean_image_plot(large_dataset, False)
-#
-# # ~~ Part 3 ~~
-# # mean would be the average value of the i-th pixel ACCROSS ALL DATA POINTS
-# # standardized value for the i-th pixel in a particular data point = (pixel_value - mean) / std
-# large_stdzd = np.copy(large_dataset).astype(np.float64)  # copy values, but no share same addr
-# # iterate through every COL of dataset
-# for i in range(0, large_stdzd.shape[1]):
-#
-#     std = np.std(large_stdzd[:,i])
-#     # divide by 1 for pixels with 0 variance
-#     if std == 0:
-#         std = 1
-#
-#     # this pixel is now standardized
-#     large_stdzd[:,i] = (large_stdzd[:,i] - np.mean(large_stdzd[:,i])) / std
-#
-# make_mean_image_plot(large_stdzd, True)
+# ~~ Part 2 ~~
+make_mean_image_plot(large_dataset, False)
 
-# # Plotting code for part 4
-# LINKAGES = [ 'max', 'min', 'centroid' ]
-# n_clusters = 10
-#
-#
-#
-# fig = plt.figure(figsize=(10,10))
-# plt.suptitle("HAC mean images with max, min, and centroid linkages")
-# for l_idx, l in enumerate(LINKAGES):
-#     # Fit HAC
-#     hac = HAC(l)
-#     hac.fit(small_dataset)
-#     mean_images = hac.get_mean_images(n_clusters)
-#     # Make plot
-#     for m_idx in range(mean_images.shape[0]):
-#         m = mean_images[m_idx]
-#         ax = fig.add_subplot(n_clusters, len(LINKAGES), l_idx + m_idx*len(LINKAGES) + 1)
-#         plt.setp(ax.get_xticklabels(), visible=False)
-#         plt.setp(ax.get_yticklabels(), visible=False)
-#         ax.tick_params(axis='both', which='both', length=0)
-#         if m_idx == 0: plt.title(l)
-#         if l_idx == 0: ax.set_ylabel('Class '+str(m_idx), rotation=90)
-#         plt.imshow(m.reshape(28,28), cmap='Greys_r')
-# plt.show()
+# ~~ Part 3 ~~
+# mean would be the average value of the i-th pixel ACCROSS ALL DATA POINTS
+# standardized value for the i-th pixel in a particular data point = (pixel_value - mean) / std
+large_stdzd = np.copy(large_dataset).astype(np.float64)  # copy values, but no share same addr
+# iterate through every COL of dataset
+for i in range(0, large_stdzd.shape[1]):
+
+    std = np.std(large_stdzd[:,i])
+    # divide by 1 for pixels with 0 variance
+    if std == 0:
+        std = 1
+
+    # this pixel is now standardized
+    large_stdzd[:,i] = (large_stdzd[:,i] - np.mean(large_stdzd[:,i])) / std
+
+make_mean_image_plot(large_stdzd, True)
+
+# Plotting code for part 4
+LINKAGES = [ 'max', 'min', 'centroid' ]
+n_clusters = 10
+
+
+
+fig = plt.figure(figsize=(10,10))
+plt.suptitle("HAC mean images with max, min, and centroid linkages")
+for l_idx, l in enumerate(LINKAGES):
+    # Fit HAC
+    hac = HAC(l)
+    hac.fit(small_dataset)
+    mean_images = hac.get_mean_images(n_clusters)
+    # Make plot
+    for m_idx in range(mean_images.shape[0]):
+        m = mean_images[m_idx]
+        ax = fig.add_subplot(n_clusters, len(LINKAGES), l_idx + m_idx*len(LINKAGES) + 1)
+        plt.setp(ax.get_xticklabels(), visible=False)
+        plt.setp(ax.get_yticklabels(), visible=False)
+        ax.tick_params(axis='both', which='both', length=0)
+        if m_idx == 0: plt.title(l)
+        if l_idx == 0: ax.set_ylabel('Class '+str(m_idx), rotation=90)
+        plt.imshow(m.reshape(28,28), cmap='Greys_r')
+plt.show()
 
 
 
