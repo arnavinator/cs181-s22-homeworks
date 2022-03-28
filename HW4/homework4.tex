@@ -162,12 +162,13 @@ the questions below when composing your answers, and to justify each step.
          \item (3, 24)
     \end{itemize}
     In the plot below, I have shown the optimal decision boundary (in light blue) based off of these points set at $\phi(x)_2 = -1.5$. The yellow points represent the class $y = 1$ and the dark blue points represent the points $y = -1$. \\
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[height=0.4\textheight]{HW4/P1part8plot.png}
+    \end{figure}
     We see that this feature mapping still admits a separable solution. However, our margin is now $0.5$, whereas our previous feature mapping had a margin of $1$. Based on this, we would prefer the the first set of feature mappings $phi$ over this new feature mapping $\phi'$. Given that our hard margin classifier is constrained by $y_i (w^T \phi(x_i) + w_0 \geq 1$, it follows that our current training framework will not be able to works optimally towards defining the boundary which perfectly separates our classes using $\phi'$ because we constrain our margin to be larger than the margin which our optimal boundary allows for. Meanwhile, using $\phi$, our margin is equal to the margin for the optimal boundary, so our training framework will be able to work towards optimally finding our ideal decision boundary.
 
-    \begin{figure}
-        \centering
-        \includegraphics{HW4/P1part8plot.png}
-    \end{figure}
+    
 \end{enumerate}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 2
@@ -262,7 +263,15 @@ The code in \texttt{T4\_P2.py} loads the images into your environment into two a
 
 
 \subsection*{Solution}
+\begin{enumerate}
+    \item 
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/P1part8plot.png}
+        \end{figure}
 
+    
+\end{enumerate}
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Problem 3
@@ -306,16 +315,21 @@ Below is my causal chain. I have written two alternative decisions at each moral
 \begin{enumerate}
     \item Google News articles are chosen as input corpus for W2V (word to vector, ie the NLP algorithm of discussion).
     \begin{itemize}
-        \item Pre-screen what kind of news articles are chosen. Ensure that no gender-biased news articles are used nor that any gender-biased quotes are referenced in the articles. This would help ensure that the media is working in a 
+        \item Pre-screen the news articles which are chosen. Ensure that no gender-biased topics are used nor that any gender-biased quotes are referenced in the articles. This would help ensure that the media our model is provided doesn't implicitly have sexist associations grouped close by.
+        \item Extract additional relationships and associations between words from the news source to make clarification for model when providing training data. Providing non-sexist additional context can help better guide the unsupervised relationships our model finds.
     \end{itemize}
     \item Words from the news article are turned into vectors by Skip-Gram, an unsupervised learning method where context words are predicted from the target word. We take a two-layer neural network, and encode words from the news article as one-hot vectors of length 300. The rows of the hidden layer weight matrix operates as a look up table for, whose rows are the word vectors (word embeddings) we desire.
     \begin{itemize}
-        \item Increase the size of the vector which encodes our vocabulary! Increasing the number of dimensions could allow for the algorithm to have more leeway in determining similarity between input encoded words, and the algorithm could be more specific.  
+        \item Increase the size of the vector which encodes our vocabulary! Increasing the number of dimensions could allow for the algorithm to have more leeway in determining similarity between input encoded words, and the algorithm could be more specific instead of making sexist analogies (given an unbiased dataset).
+        \item Add an additional layer to the neural network such that we now have 2 hidden layers, and treat both of these hidden layers as the word embedding weight matrix. An extra layer can also increase the model's specificity in determining similarity and reduce the likelihood of a model making sexist analogies (given an unbiased dataset).
     \end{itemize}
-    \item W2V has similar computed word embeddings (from the hidden layer) for these words to be similar, encompassing similarity between vectors ranging from semantic to syntactic patterns. Cosine vector similarity is used to determine similarity between 
+    \item The neural network hidden layer (which will determine our word embeddings) is trained using hierarchical softmax or negative sampling. The model opts for sub-sampling of frequent words. W2V has similar computed word embeddings (from the hidden layer) for words to be similar, encompassing similarity between vectors ranging from semantic to syntactic patterns. Cosine vector similarity is used to determine similarity between words.
     \begin{itemize}
-        \item We should have a framework where there is more cases for the 
+        \item We should have a framework where we incorporate the different kinds of patterns 
+        \item Using sub-sampling of frequent words...  Ensure that gender neutral words such as nurse are equidistant between gender pairs such as he and she. Reduce gender associations that pervade the embedding even among gender neutral words. BY INCREASING FREQUENCY OF THESE!!!+
     \end{itemize}
+    \item W2V algorithm rates finds high similarity in sexist analogies such as ``man is to
+computer programmer as woman is to homemaker" and ``father is to a doctor as a mother is to a nurse."
 
 \end{enumerate}
 \newpage
@@ -332,7 +346,9 @@ Resources:
 \begin{itemize}
     \item https://code.google.com/archive/p/word2vec/
     \item https://arxiv.org/pdf/1607.06520.pdf
-    \item https://israelg99.github.io/2017-03-23-Word2Vec-Explained/
+    \item https://israelg99.github.io/2017-03-23-Word2Vec-Explained/ 
+    \item https://www.geeksforgeeks.org/seaborn-heatmap-a-comprehensive-guide/
+    \item https://stackoverflow.com/questions/12828656/matching-1d-arrays-in-2d-arrays-in-python
 \end{itemize}
 Did you attend office hours for help with this homework?
 No.
