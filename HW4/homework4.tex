@@ -265,11 +265,95 @@ The code in \texttt{T4\_P2.py} loads the images into your environment into two a
 \subsection*{Solution}
 \begin{enumerate}
     \item 
+            As we can see, our loss never increases.
+
         \begin{figure}[h!]
             \centering
-            \includegraphics[height=0.4\textheight]{HW4/P1part8plot.png}
+            \includegraphics[height=0.4\textheight]{HW4/P2part1plot.png}
+        \end{figure}
+\newpage
+    \item 
+
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/P1KmeansNonstandard.png}
+        \end{figure}
+    
+    \newpage
+    \item 
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/P1KmeansStandard.png}
+        \end{figure}
+    We see that our centroids differ visually as the mean images are more blurred, and appear to be an overlay of multiple digits being combined into the same cluster. 
+    \\ It appears that in both standardized and nonstandardized data, our Kmeans often forms mean images resembling 0 or 9 more than once within the same iteration, while clusters mean images don't seem to resemble 4. 
+    \\ However, in standardized data, there appears to be a higher occurence of mean images which resemble 8. This seems reasonable since after standardizing pixels accross our training set, these pixels on average have high pixel values close to the center of the images, which is exploited by digits such as 8 which have a wide spread of high pixel values across the center of images. This wide (blurred) pixel distribution is exploited when updating mean images in each iteration of Kmeans.  
+    \newpage
+    \item 
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/HAC_part4.png}
+        \end{figure}
+    We see that HAC as less crisp cluster means as compared to the mean images of Kmeans. This makes sense, since Kmeans strives to minimize the norm between the cluster centroid and vectors of the cluster, and allows for reassignment of clusters, whereas HAC uses a less ``strict" distance function to define clossness and does not allow for reassignment of clusters. \\
+    We only run HAC once because HAC is non-probabilistic. Given the same dataset, the linkage between all initial clusters (each induvidual image) will be the same in every iteration, and the closest clusters will be merged again in the same fashion each time. 
+    
+    \newpage
+    \item 
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/P5_kmeans.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/P5_hac_max.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/P5_hac_min.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/P5_hac_centroid.png}
+        \end{figure}
+    We see that the max linkage criteria is much better at creating clusters which have more images as compared to the min linkage criteria. However, the min linkage criteria in this case is not good at distinguishing between many digits - we see that cluster index 8 pooled many images into itself which decreased diversity of our clusters. This is likely because it is easy to find a very low linkage between a large cluster and a smaller cluster by virtue of the large cluster having many images, which allows the large cluster to continue growing by absorbing the small clusters. \\
+    We see that since max linkage HAC has more uniform distribution of images per cluster and grouping based on the lowest max linkage criteria can have diverse images in each cluster, its mean cluster images are blurrier (since there are more images being averaged together). Meanwhile, since min linkage does not have a uniform distribution of images per cluster, we find that the mean cluster images are crisper (since less images are being averaged together and the images being averaged have very similar pixel distributions. Finally, Kmeans has the most of its mean images as fairly crisp, since although it had a uniform distribution of images in each cluster, the distance function which reassigns images in the cluster every iteration ensures that images in a cluster are very similar. \\
+    
+    \newpage
+    \item
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/heatmap1.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/heatmap2.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/heatmap3.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/heatmap4.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/heatmap5.png}
+        \end{figure}
+    \begin{figure}[h!]
+            \centering
+            \includegraphics[height=0.4\textheight]{HW4/heatmap6.png}
         \end{figure}
 
+    We see that max linkage HAC is closest to our Kmeans, as our heatmap shows most net overlap between number of images being in the same cluster of Kmeans and a corresponding cluster of HAC. This is because choosing to merge clusters based on the lowest max-linkage criteria is very similar to ``merging" or assigning images to clusters based on the norm between two image vectors. Therefore, both of these methods lead to cluster formations which have a fair amount of overlap as to the images found in respective clusters. \\
+    
+    \newpage \\
+    \newpage \\
+    \newpage \\
+    \item
+    If we had decided to compute confusion of each clustering method to the true digit label, I don't think that this would be a reasonable evaluation metric. While unsupervised clustering strives to group together our image vectors based on some metric of similarity, the mean image of clusters formed do not necessarily correspond to a true digit label. For instace, in Kmeans, we saw mean images which could be interpreted as resembling the true digit 1, 4 or 9, and assigning such mean images a label would be a subjective process. Thus, our resulting confusion matrix would not yield metrics which are solely dependent on clustering performace and would have some bias. Thus, the resulting confusion matrix would not be a valuable evaluation tool.  
+    
+    
     
 \end{enumerate}
 \newpage
@@ -317,17 +401,17 @@ Below is my causal chain. I have written two alternative decisions at each moral
     \item Google News articles are chosen as input corpus for W2V (word to vector, ie the NLP algorithm of discussion).
     \begin{itemize}
         \item Pre-screen the news articles which are chosen. Ensure that no gender-biased topics are used nor that any gender-biased quotes are referenced in the articles. This would help ensure that the media our model is provided doesn't implicitly have sexist associations grouped close by.
-        \item Extract additional relationships and associations between words from the news source to make clarification for model when providing training data. Providing non-sexist additional context can help better guide the unsupervised relationships our model finds.
+        \item Extract additional relationships and associations between words from the news source to make clarification for model when providing training data, perhaps by modifying phrases with implicitly known qualifiers which do not alter the meaning of the phrase at all. Providing non-sexist additional context can help better guide the unsupervised relationships our model finds.
     \end{itemize}
     \item Words from the news article are turned into vectors by Skip-Gram, an unsupervised learning method where context words are predicted from the target word. We take a two-layer neural network, and encode words from the news article as one-hot vectors of length 300. The rows of the hidden layer weight matrix operates as a look up table for, whose rows are the word vectors (word embeddings) we desire.
     \begin{itemize}
-        \item Increase the size of the vector which encodes our vocabulary! Increasing the number of dimensions could allow for the algorithm to have more leeway in determining similarity between input encoded words, and the algorithm could be more specific instead of making sexist analogies (given an unbiased dataset).
-        \item Add an additional layer to the neural network such that we now have 2 hidden layers, and treat both of these hidden layers as the word embedding weight matrix. An extra layer can also increase the model's specificity in determining similarity and reduce the likelihood of a model making sexist analogies (given an unbiased dataset).
+        \item Increase the size of the vector which encodes our vocabulary! Increasing the number of dimensions could allow for the algorithm to have more leeway in determining similarity between input encoded words, and the algorithm could be more specific and be able to better differentiate between vocabulary vectors instead of making sexist analogies (given an unbiased dataset).
+        \item Add an additional layer to the neural network such that we now have 2 hidden layers, and treat the combined input-output response of these hidden layers as the word embedding weight ``matrix." An extra layer can also increase the model's specificity in determining similarity and reduce the likelihood of a model making sexist analogies (given an unbiased dataset).
     \end{itemize}
-    \item The neural network hidden layer (which will determine our word embeddings) is trained using hierarchical softmax or negative sampling. The model opts for sub-sampling of frequent words. W2V has similar computed word embeddings (from the hidden layer) for words to be similar, encompassing similarity between vectors ranging from semantic to syntactic patterns. Cosine vector similarity is used to determine similarity between words.
+    \item The neural network hidden layer (which will determine our word embeddings) is trained using hierarchical softmax or negative sampling procedures, and opts for sampling of frequent words during training. W2V has similar computed word embeddings (from the hidden layer) for words to be similar, encompassing similarity between vectors ranging from semantic to syntactic patterns. Cosine vector similarity is used to determine similarity between words.
     \begin{itemize}
-        \item We should have a framework where we incorporate the different kinds of patterns 
-        \item Using sub-sampling of frequent words...  Ensure that gender neutral words such as nurse are equidistant between gender pairs such as he and she. Reduce gender associations that pervade the embedding even among gender neutral words. BY INCREASING FREQUENCY OF THESE!!!+
+        \item Since sampling of frequent words are used to train the model, we can introduce expert knowledge by increasing the frequency of non-sexist phrases in order to ensure that gender neutral words are equidistant between gender pairs (such as nurse) 
+        \item Since W2V similarity metrics range from semantic to syntactic patterns, we could introduce different weighting schemes when training to help emphasize which type of patterns should receive more focus when deducing word relations (for instance, demphasizing idioms which could be potentially sexist, ex. ``take it like a man")
     \end{itemize}
     \item W2V algorithm rates finds high similarity in sexist analogies such as ``man is to
 computer programmer as woman is to homemaker" and ``father is to a doctor as a mother is to a nurse."
@@ -361,5 +445,5 @@ Did you attend office hours for help with this homework?
 No.
 \subsection*{Calibration}
 Approximately how long did this homework take you to complete (in hours)? 
-20
+25
 \end{document}
