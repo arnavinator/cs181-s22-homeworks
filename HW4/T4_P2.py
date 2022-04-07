@@ -17,7 +17,11 @@ class KMeans(object):
     def __init__(self, K):
         self.K = K
 
+<<<<<<< HEAD
     # X is a (N x 784) array where 28x28 flattened is the dimensions of each of the N images.
+=======
+    # X is a (N x 784) array since the dimension of each image is 28x28.
+>>>>>>> bbba2829bf69eb2ce831a3c0c83cd80fcfde08a1
     def fit(self, X):
         # initialize prototype centroids, each of which is 1 x 784
         centers = []   # K x 784
@@ -99,7 +103,12 @@ class KMeans(object):
 class HAC(object):
     def __init__(self, linkage):
         self.linkage = linkage
+<<<<<<< HEAD
 
+=======
+    
+    # X is a (N x 784) array since the dimension of each image is 28x28.
+>>>>>>> bbba2829bf69eb2ce831a3c0c83cd80fcfde08a1
     def fit(self, X):
         cluster_count = X.shape[0]
         X = list(X)   # will have different sized rows, so we need a list of 1d np arrays as opposed to 2d np array
@@ -330,25 +339,25 @@ def make_mean_image_plot(data, standardized=False):
             plt.imshow(allmeans[k,i].reshape(28,28), cmap='Greys_r')  # covert 784 back to 28x28 im!
     plt.show()
 
-# ~~ Part 2 ~~
-make_mean_image_plot(large_dataset, False)
-
-# ~~ Part 3 ~~
-# mean would be the average value of the i-th pixel ACCROSS ALL DATA POINTS
-# standardized value for the i-th pixel in a particular data point = (pixel_value - mean) / std
-large_stdzd = np.copy(large_dataset).astype(np.float64)  # copy values, but no share same addr
-# iterate through every COL of dataset
-for i in range(0, large_stdzd.shape[1]):
-
-    std = np.std(large_stdzd[:,i])
-    # divide by 1 for pixels with 0 variance
-    if std == 0:
-        std = 1
-
-    # this pixel is now standardized
-    large_stdzd[:,i] = (large_stdzd[:,i] - np.mean(large_stdzd[:,i])) / std
-
-make_mean_image_plot(large_stdzd, True)
+# # ~~ Part 2 ~~
+# make_mean_image_plot(large_dataset, False)
+#
+# # ~~ Part 3 ~~
+# # mean would be the average value of the i-th pixel ACCROSS ALL DATA POINTS
+# # standardized value for the i-th pixel in a particular data point = (pixel_value - mean) / std
+# large_stdzd = np.copy(large_dataset).astype(np.float64)  # copy values, but no share same addr
+# # iterate through every COL of dataset
+# for i in range(0, large_stdzd.shape[1]):
+#
+#     std = np.std(large_stdzd[:,i])
+#     # divide by 1 for pixels with 0 variance
+#     if std == 0:
+#         std = 1
+#
+#     # this pixel is now standardized
+#     large_stdzd[:,i] = (large_stdzd[:,i] - np.mean(large_stdzd[:,i])) / std
+#
+# make_mean_image_plot(large_stdzd, True)
 
 # Plotting code for part 4
 LINKAGES = [ 'max', 'min', 'centroid' ]
