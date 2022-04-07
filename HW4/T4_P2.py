@@ -17,7 +17,11 @@ class KMeans(object):
     def __init__(self, K):
         self.K = K
 
+<<<<<<< HEAD
     # X is a (N x 784) array where 28x28 flattened is the dimensions of each of the N images.
+=======
+    # X is a (N x 784) array since the dimension of each image is 28x28.
+>>>>>>> bbba2829bf69eb2ce831a3c0c83cd80fcfde08a1
     def fit(self, X):
         # initialize prototype centroids, each of which is 1 x 784
         centers = []   # K x 784
@@ -99,7 +103,12 @@ class KMeans(object):
 class HAC(object):
     def __init__(self, linkage):
         self.linkage = linkage
+<<<<<<< HEAD
 
+=======
+    
+    # X is a (N x 784) array since the dimension of each image is 28x28.
+>>>>>>> bbba2829bf69eb2ce831a3c0c83cd80fcfde08a1
     def fit(self, X):
         cluster_count = X.shape[0]
         X = list(X)   # will have different sized rows, so we need a list of 1d np arrays as opposed to 2d np array
