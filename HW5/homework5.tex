@@ -323,26 +323,55 @@ Code:
 
 \begin{python}
 def pca(x, n_comps=500):
-    top_eigvals = 'not implemented'
-    top_pcomps = 'not implemented'
-    return top_eigvals, top_pcomps
-
+    # make x mean-centered - center the columns before doing PCA
+    centered_x = np.copy(x).astype(np.float64)
+    for i in range(0, x.shape[1]):
+        centered_x[:,i] = centered_x[:,i] - np.mean(x[:,i])
+    
+    U, Z, VT = np.linalg.svd(centered_x)
+    
+    # eigenvalues \lambda_i = z_i^2 / N
+    top_eigvals = np.power(Z,2) / x.shape[0]
+    
+    # corresponding eigenvectors are rows of cols of V, ie rows of VT
+    top_pcomps = VT   # principal components 
+    
+    
+    # return the entire dataset
+    return top_eigvals[0:n_comps], top_pcomps[0:n_comps, :]
 
 def calc_cfvs(eigvals):
-    cum_frac_vars = 'not implemented'
+    cum_frac_vars = np.zeros(eigvals.shape[0])
+    denom = np.sum(eigvals)
+    for i in range(1,eigvals.shape[0]+1):
+        cum_frac_vars[i-1] = np.sum(eigvals[0:i]) / denom
     return cum_frac_vars
 
-
 def calc_errs(x, pcomps):
-    err_mean = 'not implemented'
-    err_pcomp = 'not implemented'
+    mean_im = np.reshape(np.mean(x, axis=0), (1,784)) # 784x1 array
+    err_mean = np.mean(np.linalg.norm(x - mean_im, axis=1)**2) 
+    # mean_proj = (x @ mean_im) @ mean_im.T   # (x @ mean_im) is 6000x1 s.t. mean_proj is 6000x784
+    # err_mean = np.mean(np.linalg.norm(x - mean_proj, axis=1)**2)         
+    
+    # reconstruction loss ||xn − (x · w)w||2 given w is vector which we project data onto
+    # we are told to choose only first 10 principal components
+    pcomp = pcomps[0:10, :].T  # 784x10 array
+    pcomp_proj = (x @ pcomp) @ pcomp.T   # (x @ mean_pcomp) is 6000x10 s.t. pcomp_proj is 6000x784
+    err_pcomp = np.mean(np.linalg.norm(x - pcomp_proj, axis=1)**2)
+    
     return err_mean, err_pcomp
 \end{python}
 
 \begin{enumerate}
+  \item As we see on the cummulative proportion of variance plot, the cummulative proportion of variance increases as k increases. When considering only the 500 most significant principal components, the first few most signifcant components cover the most amount of variance, the first 100 most significant components cover around 90\% of the variance, and all 500 components of course cover 100\% of the variance covered (when only considering these 500 components). \\
+  Meanwhile, when considering all 784 principal components, the first 500 most significant principal components cover 99.93983\% of the total variance.
+  
   \item 
+  We see that the mean image is much 
+  
   \item 
-  \item 
+  Since the reconstruction loss is calculated by projecting the data onto the principal axis, and then computing the difference between the projected data and the actual data, if we rotate our principal component, we are now projecting the data onto a different vector (that is no longer the direction of variance that was intended). Since we are projecting the data onto a new vector that is not our original principal axis, the difference between the projected data and actual data will now lead to a different reconstruction error. \\
+  Our interpretation of the principal components would also change - a principal component which was originally a vector pointing in the direction of maximal variance will no longer point in the direction after rotation. 
 \end{enumerate}
 
 \newpage
@@ -446,7 +475,7 @@ questions and show your work (i.e., state what the blocking path(s) is/are and w
 \begin{enumerate}
   \item No. Since Travelling is not observed, by d-separation rules the path from Weekend to Travelling to Get Sleep is not blocked. Thus, Weekend and Get Sleep are not independent.
   
-  \item 
+  \item Yes. Since Get Sleep is not observed and Eat Exotic Foods is not observed, the path from Sick -- Get Sleep  -- Travelling is blocked, Sick -- Eat Exotic Foods -- Travelling is blocked, and and Sick -- Eat Exotic Foods -- Friends Over is blocked. Since these three paths are all the undirected paths which are possible to be taken from Sleep to Weekend, every
   \item 
   \item 
   \item 
