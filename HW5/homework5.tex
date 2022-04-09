@@ -144,43 +144,112 @@ Using the~$\boldq_n$ estimates from the Expectation Step, derive an update for m
 \subsection*{Solution}
 
 \begin{enumerate}
-  \item
   \item 
+  \begin{align}
+      \log p(\{x_n\}^N_{n=1}; \btheta, \{\beta_k\}^K_{k = 1}) &= \sum_{n=1}^N \log p(\{x_n; \btheta, \{\beta_k\}^K_{k = 1}) \\
+      &= \sum_{n=1}^N \log (\sum_{k=1}^K p(x_n, z_n = C_k; \btheta, \beta_k)) \\
+      &= \sum_{n=1}^N \log (\sum_{k=1}^K p(z_n = C_k; \btheta) p(x_n | z_n = C_k; \btheta, \beta_k)) \\
+      &= \sum_{n=1}^N \log (\sum_{k=1}^K \theta_k \frac{\beta_k^\alpha}{\Gamma(\alpha)} x_n^{\alpha-1} e^{-x_n \beta_k})
+  \end{align}
+  We see that optimizing this likelihood directly is intractable since summation over $K$ classes of our latents $z_n$ (in order to marginalize out the latents) is inside the logarithm, which prevents us from computing an optimal solution analytically.
+  
+  
   \item 
+  \begin{align}
+      -\log p(\mathcal D; \btheta, \{\beta_k\}^K_{k=1}) &= - \sum_{n=1}^N \log p(x_n, z_n; \btheta, \{\beta_k\}_{k=1}^K)) \\
+      &= - \sum_{n=1}^N \log p(z_n; \btheta) + \log p(x_n | z_n; \btheta, \{\beta_k\}_{k=1}^K)) \\
+      &= - \sum_{n=1}^N \sum_{k=1}^K z_{nk} \log (\theta_k) + z_{nk} \log (\frac{\beta_k^\alpha}{\Gamma(\alpha)} x_n^{\alpha-1} e^{-x_n \beta_k}) \\
+      &= - \sum_{n=1}^N \sum_{k=1}^K z_{nk} \log (\theta_k) + z_{nk} \log (\frac{\beta_k^\alpha}{\Gamma(\alpha)} x_n^{\alpha-1}) - z_{nk} x_n \beta_k
+  \end{align}
+  
+  
+  \item  
+  Let $q_nk$ be the $k^{th}$ element of vector $q_n$ for $k \in  K$. 
+  \begin{align}
+      q_{nk} = p(z_n = C_k | x_n ; \btheta, \beta_k) &= \frac{p(x_n | z_n = C_k; \btheta, \beta_k) p(z_n = C_k; \theta, \beta_k)}{p(x_n; \btheta, \beta_k)} \\
+      &= \frac{\frac{\theta_k \beta_k^\alpha}{\Gamma(\alpha)} x_n^{\alpha-1} e^{-x_n \beta_k}}{\sum_{k=1}^K \frac{\theta_k \beta_k^\alpha}{\Gamma(\alpha)} x_n^{\alpha-1} e^{-x_n \beta_k}} \\
+      &= \frac{{\theta_k \beta_k^\alpha}  e^{-x_n \beta_k}}{\sum_{k=1}^K {\theta_k \beta_k^\alpha}  e^{-x_n \beta_k}}
+  \end{align}
+  Concatenating these $q_{nk}$'s, we construct $q_n$.
+  
+  
   \item 
     \begin{enumerate}
       \item 
-      \item 
-      \item 
+      Since expectation is linear, we see that 
+      \begin{align}
+          E[\log p(\mathcal D; \btheta, \{\beta_k\}^K_{k=1})] &= \sum_{n=1}^N E[\log p(z_n; \btheta)] + E[\log p(x_n | z_n = C_k;  \btheta, \{\beta_k\}^K_{k=1} ] \\ 
+          &= \sum_{n=1}^N \sum_{k=1}^K p(z_n = C_k | x_n ; \btheta, \beta_k) (\log p(z_n= C_k; \btheta) + \log p(x_n | z_n = C_k; \btheta, \beta_k)) \\
+          &= \sum_{n=1}^N \sum_{k=1}^K  q_{nk} ( \log(\theta_k) + \log(\frac{\beta_k^\alpha}{\Gamma(\alpha)} x_n^{\alpha-1}) - x_n \beta_k)
+      \end{align}
+      
+      \item Using Langrange multipliers to find our optimal $\theta_k$, we construct the following Langrangian:
+      \begin{align}
+          \L (\theta_k, \lambda) = \sum_{n=1}^N \sum_{k=1}^K (  q_{nk} ( \log(\theta_k) + \log(\frac{\beta_k^\alpha}{\Gamma(\alpha)} x_n^{\alpha-1}) - x_n \beta_k)) - \lambda (\sum_{k=1}^K (\theta_k) - 1) 
+      \end{align}
+      We now take derivative of $\L$ with respect to $\theta_k$ and $\lambda$, and set them equal to $0$ to work towards our optimal $\theta_k$ value. Observe that although $q_{nk}$ itself depended on $theta_k$ during our expectation step, for our maximization step we treat $q_{nk}$ as constant since we have already computed this value (and will update it again in the next expectation step iteration).
+      \begin{align}
+        \frac{\partial \L}{\partial\theta_k} =  \frac{\sum_{n=1}^N q_{nk}}{\theta_k} - \lambda = 0 &\implies \theta_k = \frac{\sum_{n=1}^N q_{nk}}{\lambda} \\ \frac{\partial \L}{\partial\lambda} \sum_{k=1}^K\theta_k - 1 =0 &\implies \sum_{k=1}^K\theta_k =1
+      \end{align}
+      Combining our results from (16) and (17),
+      \begin{align}
+          \frac{\sum_{k=1}^K \sum_{n=1}^N q_{nk}}{\lambda} = 1 \implies \lambda = \sum_{k=1}^K \sum_{n=1}^N q_{nk}= N
+      \end{align}
+      since the components of $q_n$ sum to 1 and we have N $q_n$ vectors. Thus, we put our value of $\lambda$ into (16) to find that 
+      $$\hat{\theta}_k = \frac{\sum_{n=1}^N q_{nk}}{N} $$
+    
+    This optimal $\btheta$ is intuitive. The sum of posterior probabilities over $z_n$ which are assigned to each cluster ($\sum_{n=1}^N q_{nk}$) divided by the total number of datapoints is a logical way to form our class prior estimation, since we have no reason to believe that $z_n$ will be biased for/against some $C_k$. Given $q_n$ must sum to 1, approximating that $z_n = C_k$ by summing posterior probabilities is analagous to estimating the number of datapoints which will be in $C_k$, so dividing this sum by $N$ to approximate $\theta_k$ is a logical probablistic approximation for a datapoint being in $C_k$.
+
+      \item  
+      \begin{align}
+          \frac{\partial E[\log p(\mathcal D; \btheta, \{\beta_k\}^K_{k=1})]}{\partial \beta_k} &= \sum_{n=1}^N q_{nk} \frac{\alpha}{\beta_k} - q_{nk} \beta_k = 0 \\
+          &\implies \frac{\alpha}{\beta_k} \sum_{n=1}^N q_{nk} = \sum_{n-1}^N q_{nk} x_n \\
+          &\implies \beta_k = \frac{\alpha \sum_{n=1}^N q_{nk}}{\sum_{n=1}^N q_{nk} x_n }
+      \end{align}
     \end{enumerate}
-  \item 
+    This value for $\beta_k$ makes sense. For our numerator, the product of $\alpha$ and the sum of posterior probabilities over $z_n$ which are assigned to each cluster ($\sum_{n=1}^N q_{nk}$) will increase as our estimate of the number of datapoints in $C_k$ increases. \\
+    Meanwhile, our divisor which is the sum of posterior probabilities scaled by each corresponding datapoint will increase as our estimate of the number of datapoints in $C_k$ increases and if the estimated datapoints in $C_k$ are large. \\
+    Altogether, we see that if our datapoints predicted to be in $C_k$ are large, then $beta_k$ will decrease such that the gamma distribution PDF has a smaller spread, while otherwise $\beta_k$ will increase and our gamma distribution will have its PDF more broadly spread to better allow for updating $q_{nk}$ relative to these datapoints. 
+  \item  We could use our derivation for complete data log likelihood as well as our optimal distribution parameter estimates if were to replace $q_{nk}$ with $z_{nk}$. This is allowed since our complete data log likelihood estimate corresonds closely to our generative classification log likelihood expression, and our optimal parameter derivations treat $q_{nk}$ as constant during the maximization step such that replacing $q_{nk}$ with $z_{nk}$ will not affect the derivation outcome.
   \item 
     Plot:
 
-    % \includegraphics[width=\linewidth]{p1}
+    \includegraphics[width=\linewidth]{p1}
 
     Code:
 
     \begin{python}
 def e_step(theta, betas):
-    q = 'not implemented'
+    # expand x to have 3 copies of itself
+    x_expand = np.column_stack((x,x,x))
+    num = gamma.pdf(x_expand, a=alpha, scale = 1/betas) * theta
+    q = num / np.reshape(np.sum(num, axis=1), (x.shape[0], 1))
     return q
 
-
 def m_step(q):
-    theta_hat = 'not implemented'
-    beta_hats = 'not implemented'
+    # theta_hat_k = sum_n{q_nk} / N
+    theta_hat = np.sum(q, axis=0) / x.shape[0]  #kx1 vector
+    
+    # beta_hat_k = alpha * sum_n{q_nk} / sum_n{q_nk * x_k}
+    # to calculate denom, expand x (Nx1) to 3 copies of self (Nx3) to multiply with q
+    x_expand = np.column_stack((x,x,x))
+    denom = np.sum(q * x_expand, axis=0)
+    beta_hats = alpha * np.sum(q, axis=0) / denom
+    
     return theta_hat, beta_hats
 
-
 def log_px(x, theta, betas):
-    p = 'not implemented'
+    log{sum_k{gamma(alpha,beta_k) * theta_k}}
+    p = np.zeros(x.shape[0]) 
+    for n in range(0, x.shape[0]):
+        num = gamma.pdf(x[n], a=alpha, scale = 1/betas) * theta
+        p[n] = np.log(np.sum(num)) 
     return p
 
-
 def run_em(theta, betas, iterations=1000):
-    theta = 'not implemented'
-    betas = 'not implemented'
+    for i in range(0, iterations):
+        q = e_step(theta, betas)
+        theta, betas = m_step(q)
     return theta, betas
     \end{python}
 \end{enumerate}
@@ -245,10 +314,10 @@ For this problem you will implement PCA from scratch on the first 6000 images of
 \subsection*{Solution}
 Plots:
 
-% \includegraphics[width=\linewidth]{p2_cfvs}
+\includegraphics[width=\linewidth]{p2_cfvs}
 
-% \includegraphics[width=0.25\linewidth]{p2_mean}
-% \includegraphics[width=0.75\linewidth]{p2_pcomps}
+\includegraphics[width=0.25\linewidth]{p2_mean}
+\includegraphics[width=0.75\linewidth]{p2_pcomps}
 
 Code:
 
@@ -375,7 +444,8 @@ questions and show your work (i.e., state what the blocking path(s) is/are and w
 \newpage
 \section*{Solution}
 \begin{enumerate}
-  \item 
+  \item No. Since Travelling is not observed, by d-separation rules the path from Weekend to Travelling to Get Sleep is not blocked. Thus, Weekend and Get Sleep are not independent.
+  
   \item 
   \item 
   \item 
