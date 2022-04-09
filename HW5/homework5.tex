@@ -366,8 +366,18 @@ def calc_errs(x, pcomps):
   \item As we see on the cummulative proportion of variance plot, the cummulative proportion of variance increases as k increases. When considering only the 500 most significant principal components, the first few most signifcant components cover the most amount of variance, the first 100 most significant components cover around 90\% of the variance, and all 500 components of course cover 100\% of the variance covered (when only considering these 500 components). \\
   Meanwhile, when considering all 784 principal components, the first 500 most significant principal components cover 99.93983\% of the total variance.
   
-  \item 
-  We see that the mean image is much 
+  \item \\
+  \includegraphics[width=0.75\linewidth]{HW5/k_means.pdf} \\
+    \includegraphics[width=0.75\linewidth]{p2_pcomps} \\
+
+  We see that the top ten principal components from PCA are more blurry and less resemblant of any digits as compared to the cluster centers from K-means (which was run on the same mean-centered data as PCA). This makes sense, since the principal images which correspond to the highest variance axes of data don't necessarily correspond to digits, whereas clusters of similar-appearing images which were derived in K-means are more likely to appear as digits. \\
+  We also see that digits such as 0 and 9 are seen in PCA and K-means, indicating that these are digits which have distinctly high variance relative to the dataset (as seen in PCA) and thus are able to (somewhat) precisely cluster together other digits which appear as 0 or 9 respectively (as seen in K-Means).
+
+  \item
+  The reconstruction error on the data set using the mean image of the dataset is $3.44 * 10^6$. \\
+  The reconstruction error on the data set using the first 10 principal components is $1.92*10^6$. \\
+  The final objective loss achieved by using K-means on the dataset (mean residual sum of squares) is $2.5*10^6$. \\
+  We see that the reconstruction error using the mean image is the highest, which makes sense since the mean image is the least specific to any image in the dataset. Meanwhile, the reconstruction error for the first 10 principal components and K-Means are relatively very close, which makes sense since more images which match the data more closely are considered when reconstructing the error. PCA error is slightly lower than the K-Means error -- this makes sense since the PCA reconstruction error is choosing a linear combination of input images to construct principal images which have maximal variance, whereas K-means is not choosing cluster centers which have maximal variance and is dependent on the randomly initialized $\mu_k$'s when forming the cluster centers we converge to. 
   
   \item 
   Since the reconstruction loss is calculated by projecting the data onto the principal axis, and then computing the difference between the projected data and the actual data, if we rotate our principal component, we are now projecting the data onto a different vector (that is no longer the direction of variance that was intended). Since we are projecting the data onto a new vector that is not our original principal axis, the difference between the projected data and actual data will now lead to a different reconstruction error. \\
@@ -475,12 +485,42 @@ questions and show your work (i.e., state what the blocking path(s) is/are and w
 \begin{enumerate}
   \item No. Since Travelling is not observed, by d-separation rules the path from Weekend to Travelling to Get Sleep is not blocked. Thus, Weekend and Get Sleep are not independent.
   
-  \item Yes. Since Get Sleep is not observed and Eat Exotic Foods is not observed, the path from Sick -- Get Sleep  -- Travelling is blocked, Sick -- Eat Exotic Foods -- Travelling is blocked, and and Sick -- Eat Exotic Foods -- Friends Over is blocked. Since these three paths are all the undirected paths which are possible to be taken from Sleep to Weekend, every
-  \item 
-  \item 
-  \item 
-  \item 
-  \item 
+  \item Yes. Since Get Sleep is not observed and Eat Exotic Foods is not observed, the path from Sick -- Get Sleep  -- Travelling is blocked, Sick -- Eat Exotic Foods -- Travelling is blocked, and and Sick -- Eat Exotic Foods -- Friends Over is blocked. Since these three paths are all the undirected paths which can be taken from Sick to Weekend, every path is blocked, and by d-separation rules, Sick and Weekend are independent. 
+  
+  \item  No. Since we observe Eat Exotic Foods, the path Sick -- Eat Exotic Foods -- Friends Over is not blocked. Thus, by d-separation rules, Sick and Friends are not independent given Eat Exotic Foods.
+  
+  \item No. Since Weekend is not observed, the path Friends Over -- Weekend -- Travelling is unblocked. Since Travelling is not observed, the path Weekend -- Travelling -- Get Sleep is unblocked. Therefore, the path Friends Over -- Weekend -- Travelling -- Get Sleep is unblocked, and by d-separation rules, Friends Over and Get Sleep are not independent. 
+  
+  \item Yes. (only need to explain why if answer is No).
+  
+  
+  \item  \\
+  \begin{center}
+    \begin{tikzpicture}[
+      node distance=1cm and .5cm,
+      bn/.style={draw,ellipse,text width=2cm,align=center}
+        ]
+        \node[bn] (w) {\attr{Weekend}};
+        \node[bn,below right=of w] (t) {\attr{Traveling}};
+        \node[bn,right=of t] (s) {\attr{Sick}};
+        \node[bn,below left=of w] (f) {\attr{Friends over}};
+        \node[bn,below right=of f] (eef) {\attr{Eat exotic foods}};
+        \node[bn,right=of eef] (gs) {\attr{Get sleep}};
+        \path (w) edge[-latex] (t)
+        (w) edge[-latex] (f)
+        (f) edge[-latex] (eef)
+        (t) edge[-latex] (eef)
+        (s) edge[-latex] (gs)
+        (s) edge[-latex] (eef);
+        \end{tikzpicture}
+    \end{center}
+  \item Yes. Friends Over and Get Sleep are Independent. Observe that in our new model, the only two undirected paths from Friends Over to Get Sleep are 
+  \begin{enumerate}
+      \item Friends Over -- Weekend -- Travelling -- Eat Exotic Foods -- Sick -- Get Sleep   
+      \item Friends Over -- Eat Exotic Foods -- Sick -- Get Sleep
+  \end{enumerate}
+  In order for Friends Over and Get Sleep to no longer be independent, then we need to unblock at least one of these two paths at some node. Observing Eat Exotic Foods unblocks (a) and (b). (This is the only observation that leads to unblocking, as changing any other observation from what it currently is will lead to additional blockage of the undirected path(s) instead of unblockage, which could not help us in making Friends Over and Get Sleep dependent).
+  
 \end{enumerate}
 
 \newpage
@@ -488,11 +528,13 @@ questions and show your work (i.e., state what the blocking path(s) is/are and w
 % Name and Calibration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{Name}
-
+Arnav Srivastava
 \subsection*{Collaborators and Resources}
-Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+Whom did you work with, and did you use any resources beyond cs181-textbook and your notes? \\
+Chinmay Deshpande. No resources were used beyond the textbook.
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)? 
+Approximately how long did this homework take you to complete (in hours)? \\
+20
 
 \end{document}
