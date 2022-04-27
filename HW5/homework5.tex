@@ -349,9 +349,7 @@ def calc_cfvs(eigvals):
 
 def calc_errs(x, pcomps):
     mean_im = np.reshape(np.mean(x, axis=0), (1,784)) # 784x1 array
-    err_mean = np.mean(np.linalg.norm(x - mean_im, axis=1)**2) 
-    # mean_proj = (x @ mean_im) @ mean_im.T   # (x @ mean_im) is 6000x1 s.t. mean_proj is 6000x784
-    # err_mean = np.mean(np.linalg.norm(x - mean_proj, axis=1)**2)         
+    err_mean = np.mean(np.linalg.norm(x - mean_im, axis=1)**2)
     
     # reconstruction loss ||xn − (x · w)w||2 given w is vector which we project data onto
     # we are told to choose only first 10 principal components
