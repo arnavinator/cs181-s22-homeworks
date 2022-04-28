@@ -224,8 +224,53 @@ Note that we are doing infinite-horizon planning to maximize the expected reward
     For $ct = 0.001$, it took 31 iterations to converge. \\
     For $ct = 0.0001$, it took 38 iterations to converge.\\
     We see that as $ct$ decreases, the number of iterations until convergence increases. This makes sense, since a smaller $ct$ demands that our previous and current value function be closer and closer in their maximal state distance, which calls for a greater number of updating values (ie greater number of iterations).
+    \begin{figure}[h!]
+        \includegraphics[width=0.5\textwidth]{HW6/Value_25.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_31.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_38.png}
+        \caption{2b. Final learned value function and policy plots for $ct = 0.01, 0.001, 0.0001$ respectively}
+    \end{figure}
+
     \item[3.] For policy iteration, the number of iterations is lower until the algorithm converges, the time per iteration is smaller, and therefore the overall runtime is faster when compared to value iteration.
     \item[4.]
+    Choosing $ct = 0.001$ and letting both algorithms run until convergence, we have the following plots for policy iteration and value iteration for $\gamma = 0.6, 0.7, 0.8, 0.9$.
+    \begin{figure}[h!]
+        \includegraphics[width=0.5\textwidth]{HW6/Value_1.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_2.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_3.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_4.png}
+        \caption{4. Policy Iteration plots for $\gamma = 0.6, 0.7, 0.8, 0.9$ respectively}
+    \end{figure}
+    \begin{figure}[h!]
+        \includegraphics[width=0.5\textwidth]{HW6/Value_1.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_2.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_3.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_4.png}
+        \caption{4. Policy Iteration plots for $\gamma = 0.6, 0.7, 0.8, 0.9$ respectively}
+    \end{figure}
+    \begin{itemize}
+        \item $\gamma = 0.6$
+        \begin{itemize}
+            \item Policy Iteration took 4 iterations
+            \item Value Iteration took 27 iterations
+        \end{itemize}
+        \item $\gamma = 0.7$
+        \begin{itemize}
+            \item Policy Iteration took 5 iterations
+            \item Value Iteration took 38 iterations
+        \end{itemize}
+        \item $\gamma = 0.8$
+        \begin{itemize}
+            \item Policy Iteration took 6 iterations
+            \item Value Iteration took 59 iterations
+        \end{itemize}
+        \item $\gamma = 0.9$
+        \begin{itemize}
+            \item Policy Iteration took 6 iterations
+            \item Value Iteration took 124 iterations
+        \end{itemize}
+    \end{itemize}
+    
     
     \item[5.]
 \end{itemize}
