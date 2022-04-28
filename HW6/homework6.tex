@@ -208,21 +208,25 @@ Note that we are doing infinite-horizon planning to maximize the expected reward
         \caption{1d. Final learned value function and policy for $ct = 0.01, 0.001, 0.0001$}
     \end{figure}
 
-    More broadly, I expect making $ct$ smaller will increase the number of iterations until convergence. However, in our case our criteria for determining that the algorithm has converged is when $ct$ is greater than the largest difference between the current value and previous value amongst all possible states; on our fifth iteration, our values are not changed and the greatest largest between current and previous values amongst all states is $0$. Thus, for any $ct > 0$, our number of iterations will be 5. 
+    While broadly-speaking, making $ct$ smaller increases the number of iterations until convergence, in our case, once $ct$ is small, having $ct$ approach closer and closer to $0$ will not change our number of iterations until convergence. Our criteria for determining that the algorithm has converged is when $ct$ is greater than the largest difference between the current value and previous value amongst all possible states; on our fifth iteration, our values are not changed and the greatest largest between current and previous values amongst all states is $0$. Thus, for any small $ct > 0$, our number of iterations will be 5. 
 
     \item[2a.] Completed!
     \item[2b.] 
         \begin{figure}[h!]
-        \includegraphics[width=0.5\textwidth]{HW6/Policy_1.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Policy_2.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Policy_3.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Policy_4.png}
-        \caption{1c. Final learned value function and policy plots}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_1.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_2.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_3.png}
+        \includegraphics[width=0.5\textwidth]{HW6/Value_4.png}
+        \caption{2b. Final learned value function and policy plots}
     \end{figure}
-
     \item[2c.]
-    \item[3.]
+    For $ct = 0.01$, it took 25 iterations to converge. \\
+    For $ct = 0.001$, it took 31 iterations to converge. \\
+    For $ct = 0.0001$, it took 38 iterations to converge.\\
+    We see that as $ct$ decreases, the number of iterations until convergence increases. This makes sense, since a smaller $ct$ demands that our previous and current value function be closer and closer in their maximal state distance, which calls for a greater number of updating values (ie greater number of iterations).
+    \item[3.] For policy iteration, the number of iterations is lower until the algorithm converges, the time per iteration is smaller, and therefore the overall runtime is faster when compared to value iteration.
     \item[4.]
+    
     \item[5.]
 \end{itemize}
 
