@@ -31,8 +31,10 @@ class Learner(object):
         # there are 2 possible actions, 7 possible x-values, 9 possible y-values
         self.Q = np.zeros((2, X_SCREEN // X_BINSIZE, Y_SCREEN // Y_BINSIZE))   # 2x7x9 matrix
 
-        self.alpha = 0.2  # learning rate
-        self.gamma = 0.6    # discount factor
+        # to have decaying alpha for Q-learning to converge to the optimal solution,
+        # we choose to have a_t(s,a) =  1/N(s,a), where N(s,a) is number of times (s,a) visited
+        self.counts = np.zeros((2, X_SCREEN // X_BINSIZE, Y_SCREEN // Y_BINSIZE))
+        self.gamma = 0.8    # discount factor
         self.epsilon = 0.001  # epsilon-greedy exploration vs optimal policy
 
     def reset(self):
@@ -75,13 +77,17 @@ class Learner(object):
         c_state = self.discretize_state(state)
         l_state = self.discretize_state(self.last_state)
 
+        # update counts
+        self.counts[self.last_action, l_state[0], l_state[1]] += 1
+
         # calculate temporal difference error: r + gamma*max_{a'}[Q(s',a')] - Q(s,a)
         qmax = np.max(self.Q[:, c_state[0], c_state[1]])
         td = self.last_reward + self.gamma*qmax - self.Q[self.last_action, l_state[0], l_state[1]]
 
         # iteration for Q-Learning
         # Q(s,a) = Q(s,a) + alpha*td
-        self.Q[self.last_action, l_state[0], l_state[1]] += self.alpha * td
+        alpha = 1/self.counts[self.last_action, l_state[0], l_state[1]]
+        self.Q[self.last_action, l_state[0], l_state[1]] +=  alpha * td
 
         # epsilon-greedy choice of current action
         if npr.rand() < self.epsilon:
@@ -121,7 +127,6 @@ def run_games(learner, hist, iters=100, t_len=100):
 
         # Save score history.
         hist.append(swing.score)
-
         # Reset the state of the learner.
         learner.reset()
     pg.quit()
@@ -141,5 +146,6 @@ if __name__ == '__main__':
     print(hist)
     print("Average score from epochs 50-100: ", np.average(np.array(hist)[49:]))
     print("Max score over all epochs: ", np.max(np.array(hist)))
-    # Save history. 
+
+    # Save history.
     np.save('hist', np.array(hist))
