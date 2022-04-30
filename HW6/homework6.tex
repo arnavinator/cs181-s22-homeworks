@@ -122,10 +122,64 @@ $$
 \end{problem}
 
 \textbf{Solution:}
+\begin{enumerate}
+    \item 
+    If $G$ is not observed, $R - G - S$ is blocked, $R$ and $S$ are independent by d-separation rules.
+    \begin{center}
+    \begin{tikzpicture}[
+      node distance=1 cm and .5cm,
+      bn/.style={draw,ellipse,text width=2cm,align=center}
+        ]
+        \node[bn] (eef) {\attr{G}};
+        \node[bn, above right=of eef] (t) {\attr{S}};
+        \node[bn, above left=of eef] (f) {\attr{R}};
+        \path (t) edge[-latex] (eef)
+        (f) edge[-latex] (eef);
+        \end{tikzpicture}
+    \end{center}
+    
+    \item 
+    \begin{align}
+        P(S = 1 | R = 1) &= \frac{P(S=1, R=1)}{P(R=1)} \\
+        &= \frac{P(G=0 | S=1, R=1)P(R=1)P(S=1) + P(G=1 | S=1, R=1)P(R=1)P(S=1)}{P(R=1)} \\
+        &= \frac{(0)(0.25)(0.5) + (1)(0.25)(0.5)}{(0.25)} = 0.5
+    \end{align} 
+    
+    \item 
+    \begin{align}
+        P(S=1 | G=1) &= \frac{P(S=1, G=1)}{P(G=1)} \\
+        &= \frac{P(G=1 | S=1, R=0)P(S=1)P(R=0) + P(G=1 | S=1, R=1)P(S=1)P(R=1)}{0.5} \\
+        &= \frac{(0.75)(0.5)(0.75) + (1)(0.5)(0.25)}{0.5} = 0.8125
+    \end{align}
+    
+    
+    \item
+    \begin{align}
+        P(S=1 | R=1, G=1) &= \frac{P(S=1, R=1, G=1)}{P(R=1, G=1)} \\
+        &= \frac{P(R=1)P(S=1)P(G=1|R=1, S=1)}{P(G=1 | S=0, R=1)P(R=1)P(S=0) + P(G=1 | S=1, R=1)P(R=1)P(S=1)} \\
+        &= \frac{(0.25)(0.5)(1)}{(0.75)(0.5)(0.25) + (1)(0.5)(0.25)} = 0.5714 
+    \end{align}
+    
+    \item Given that the grass is wet and knowing that it is raining makes the probability of the sprinkler being on lower compared to only knowing that the grass is wet and having no information on if it is raining, because we are ``explaining away" why grass is wet (via rain).
+    
+    \item
+    \begin{align}
+        P(R) &= \sum_C \sum_G \sum_S P(C) P(R | C) P(S | C) P(G | R,S) \\
+        &= \sum_C P(C) P(R | C) \sum_G \sum_S P(G | R, S) P(S | C)
+    \end{align}
+    
+    \item
+    \begin{align}
+        P(R) &= \sum_S \sum_G \sum_C P(C) P(R | C) P(S | C) P(G | R,S) \\
+        &= \sum_S \sum_G P(G | R,S) \sum_C P(C) P(R | C) P(S | C)
+    \end{align}
+    
+    \item 6. takes $2^3 = 8$ steps and 7. takes $2^4 = 16$ steps. Thus, 7. elimination ordering takes less computation.
+
+\end{enumerate}
 
 
-
-
+\newpage
 \begin{problem}[Policy and Value Iteration, 15 pts]
 
 This question asks you to implement policy and value iteration in a
@@ -200,15 +254,16 @@ Note that we are doing infinite-horizon planning to maximize the expected reward
         \caption{1c. Final learned value function and policy plots}
     \end{figure}
     \item[1d.]
-    For $ct = 0.01$, it took 5 iterations to converge. \\
-    For $ct = 0.001$, it took 5 iterations to converge. \\
-    For $ct = 0.0001$, it took 5 iterations to converge. \\
-    \begin{figure}[h!]
+     \begin{figure}[h!]
         \includegraphics[width=0.5\textwidth]{HW6/Policy_5.png}
         \caption{1d. Final learned value function and policy for $ct = 0.01, 0.001, 0.0001$}
     \end{figure}
+    For $ct = 0.01$, it took 5 iterations to converge. \\
+    For $ct = 0.001$, it took 5 iterations to converge. \\
+    For $ct = 0.0001$, it took 5 iterations to converge. \\
+   
 
-    While broadly-speaking, making $ct$ smaller increases the number of iterations until convergence, in our case, once $ct$ is small, having $ct$ approach closer and closer to $0$ will not change our number of iterations until convergence. Our criteria for determining that the algorithm has converged is when $ct$ is greater than the largest difference between the current value and previous value amongst all possible states; on our fifth iteration, our values are not changed and the greatest largest between current and previous values amongst all states is $0$. Thus, for any small $ct > 0$, our number of iterations will be 5. 
+    While broadly-speaking, making $ct$ smaller increases the number of iterations until convergence, in our case, once $ct$ is small, having $ct$ approach closer and closer to $0$ will not change our number of iterations until convergence. Our criteria for determining that the algorithm has converged is when $ct$ is greater than the largest difference between the current value and previous value amongst all possible states; on our fifth iteration, our values are not changed and the greatest difference between current and previous values amongst all states is $0$. Thus, for any small $ct > 0$, our number of iterations will be 5. 
 
     \item[2a.] Completed!
     \item[2b.] 
@@ -220,34 +275,24 @@ Note that we are doing infinite-horizon planning to maximize the expected reward
         \caption{2b. Final learned value function and policy plots}
     \end{figure}
     \item[2c.]
-    For $ct = 0.01$, it took 25 iterations to converge. \\
-    For $ct = 0.001$, it took 31 iterations to converge. \\
-    For $ct = 0.0001$, it took 38 iterations to converge.\\
-    We see that as $ct$ decreases, the number of iterations until convergence increases. This makes sense, since a smaller $ct$ demands that our previous and current value function be closer and closer in their maximal state distance, which calls for a greater number of updating values (ie greater number of iterations).
     \begin{figure}[h!]
         \includegraphics[width=0.5\textwidth]{HW6/Value_25.png}
         \includegraphics[width=0.5\textwidth]{HW6/Value_31.png}
         \includegraphics[width=0.5\textwidth]{HW6/Value_38.png}
-        \caption{2b. Final learned value function and policy plots for $ct = 0.01, 0.001, 0.0001$ respectively}
+        \caption{2c. Final learned value function and policy plots for $ct = 0.01, 0.001, 0.0001$ respectively}
     \end{figure}
-
-    \item[3.] For policy iteration, the number of iterations is lower until the algorithm converges, the time per iteration is smaller, and therefore the overall runtime is faster when compared to value iteration.
+    For $ct = 0.01$, it took 25 iterations to converge. \\
+    For $ct = 0.001$, it took 31 iterations to converge. \\
+    For $ct = 0.0001$, it took 38 iterations to converge.\\
+    We see that as $ct$ decreases, the number of iterations until convergence increases. This makes sense, since a smaller $ct$ demands that our previous and current value function be closer and closer in their maximal state distance, which calls for a greater number of updating values (ie greater number of iterations).
+    
+\\
+\\
+\\
+\newpage
+    \item[3.] For policy iteration, the number of iterations is lower until the algorithm converges, the time per iteration is smaller, and the overall runtime is faster, when compared to value iteration.
     \item[4.]
     Choosing $ct = 0.001$ and letting both algorithms run until convergence, we have the following plots for policy iteration and value iteration for $\gamma = 0.6, 0.7, 0.8, 0.9$.
-    \begin{figure}[h!]
-        \includegraphics[width=0.5\textwidth]{HW6/Value_1.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Value_2.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Value_3.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Value_4.png}
-        \caption{4. Policy Iteration plots for $\gamma = 0.6, 0.7, 0.8, 0.9$ respectively}
-    \end{figure}
-    \begin{figure}[h!]
-        \includegraphics[width=0.5\textwidth]{HW6/Value_1.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Value_2.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Value_3.png}
-        \includegraphics[width=0.5\textwidth]{HW6/Value_4.png}
-        \caption{4. Policy Iteration plots for $\gamma = 0.6, 0.7, 0.8, 0.9$ respectively}
-    \end{figure}
     \begin{itemize}
         \item $\gamma = 0.6$
         \begin{itemize}
@@ -270,9 +315,23 @@ Note that we are doing infinite-horizon planning to maximize the expected reward
             \item Value Iteration took 124 iterations
         \end{itemize}
     \end{itemize}
-    
-    
-    \item[5.]
+    \begin{figure}[h!]
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Policy_4.png}
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Policy_5.png}
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Policy_6.png}
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Policy_6.png}
+        \caption{4. Policy Iteration plots for $\gamma = 0.6, 0.7, 0.8, 0.9$ respectively (last two plots are the same)}
+    \end{figure}
+    \begin{figure}[h!]
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Value_27.png}
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Value_38.png}
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Value_59.png}
+        \includegraphics[width=0.4\textwidth]{HW6/Gamma_Value_124.png}
+        \caption{4. Value Iteration plots for $\gamma = 0.6, 0.7, 0.8, 0.9$ respectively}
+    \end{figure}
+    We see that for both policy and value iteration, that as $\gamma$ increases, the number of iterations until convergence increases. This makes sense, since by having a larger discounting factor, we weight the expected value over all reachable next states more heavily, which means that every iteration our $V*$ changes more dynamically. Since there is greater variance between the current and past value function in each iteration due to a larger discounting factor, it will take more iterations for our algorithm to converge and meet the constraint that the greatest difference between current and previous values amongst all states is less than $ct$ will take more iterations to achieve. \\
+    For both policy and value iteration, whereas increasing $\gamma$ leads to more iterations until convergence, which leads to a longer runtime, when making both algorithms run a constant number of iterations and then changing $gamma$, as $\gamma$ increases, the total runtime decreases.  
+    \item[5.] Now that the game ends at any state with a positive reward, we expect our optimal policy at nonzero states to lead towards the closest positive reward state, while the three positive reward states (states 0, 4, and 14) will want to move towards a boundary to maximize the likelihood of staying in the same state next iteration and reaping the positive reward. As $\gamma$ increases, the policy will more strongly point towards leading states towards any of the three positive states as opposed to the dominant positive state 14, since the expected reward of reaching the less positive states is more strongly discounted.
 \end{itemize}
 
 
@@ -323,6 +382,92 @@ discount rate $\gamma$, and exploration rate $\epsilon$. \emph{Do not use outsid
 \end{figure}
     
 \textbf{Solution:}
+After implementing Q-Learning in stub.py, I was able to explore the parameter space in order to find the $\alpha, \gamma, \epsilon$ which has the best swingy monkey performance. Allowing the agent to learn over 100 epochs, metric of interest for me was the average score of the agent from epochs 50-100 (since earlier epochs are more likely to have low scores as the agent is still learning), as well as the highest score the agent achieved over all epochs. \\
+After some initial exploration, I found that the agent performed best for small $\alpha$ (since $\alpha$ that was too big would change our learned $Q$ too heavily and lead too poor long-term performance). Meanwhile, I found that a large $\gamma$ performed best (since $\gamma$ that was too small would not put enough emphasis on the expected future value from the next state). Finally, I found that a small $\epsilon$ is the best (since given that there are only two actions, the agent is able to explore the state space fairly quickly over multiple iterations, and having too much random exploration will encourage the monkey to crash too often when the agent's current optimal action is correct.    \\
+Once having a rough ballpark, I did a finer exploration of the learner parameters which had the best performance. The table below encompasses the results of these metrics based on changes in my values for $\alpha, \gamma, \epsilon$:
+
+\begin{center}
+\begin{tabular}{||c c c c c||} 
+ \hline
+ $\alpha$ & $\gamma$ & $\epsilon$ & Average score from epochs 50-100 & Highest score over all epochs \\ 
+ \hline\hline
+ 0.1 & 0.6 & 0.1 & 0.98 & 13 \\ 
+ \hline
+ 0.2 & 0.6 & 0.1 & 0.56 & 10 \\
+ \hline
+ 0.3 & 0.6 & 0.1 & 0.58 & 7 \\
+ \hline
+ 0.1 & 0.7 & 0.1 & 2.45 & 23 \\ 
+ \hline
+ 0.2 & 0.7 & 0.1 & 0.75 & 10 \\
+ \hline
+ 0.3 & 0.7 & 0.1 & 0.75 & 10 \\ 
+ \hline
+ 0.1 & 0.8 & 0.1 & 1.45 & 10 \\ 
+ \hline
+ 0.2 & 0.8 & 0.1 & 1.15 & 11 \\
+ \hline
+ 0.3 & 0.8 & 0.1 & 0.82 & 9 \\ 
+ \hline
+ \hline
+ 0.1 & 0.6 & 0.01 & 2.58 & 43 \\ 
+ \hline
+ 0.2 & 0.6 & 0.01 & 5.51 & 128 \\
+ \hline
+ 0.3 & 0.6 & 0.01 & 12.67 & 238 \\
+ \hline
+ 0.1 & 0.7 & 0.01 & 3.31 & 74 \\ 
+ \hline
+ 0.2 & 0.7 & 0.01 & 12.47 & 159 \\
+ \hline
+ 0.3 & 0.7 & 0.01 & 1.39 & 104 \\ 
+ \hline
+ 0.1 & 0.8 & 0.01 & 15.47 & 195 \\ 
+ \hline
+ 0.2 & 0.8 & 0.01 & 16.15 & 167 \\
+ \hline
+ 0.3 & 0.8 & 0.01 & 1.62 & 52 \\ 
+ \hline
+ \hline
+ 0.1 & 0.6 & 0.001 & 25.33 & 494 \\ 
+ \hline
+ \textbf{0.2} & \textbf{0.6} & \textbf{0.001} & \textbf{69.83} & \textbf{1088} \\
+ \hline
+ 0.3 & 0.6 & 0.001 & 40.22 & 645 \\
+ \hline
+ 0.1 & 0.7 & 0.001 & 63.15 & 828 \\ 
+ \hline
+ 0.2 & 0.7 & 0.001 & 50.33 & 363 \\
+ \hline
+ 0.3 & 0.7 & 0.001 & 19.67 & 247 \\ 
+ \hline
+ 0.1 & 0.8 & 0.001 & 15.52 & 914 \\ 
+ \hline
+ 0.2 & 0.8 & 0.001 & 47.78 & 680 \\
+ \hline
+ {0.3} & {0.8} & {0.001} & {40.01} & {1048} \\ 
+ \hline
+\end{tabular}
+\end{center}
+From our results, we see that the optimal parameters for performance are $\alpha = 0.2, \gamma = 0.6, \epsilon = 0.001$ with respect to highest average score from epochs 50-100, which in this case was an average score of 59.23, as well as highest overall score of 1088. \\
+We see that making $\epsilon$ smaller had the biggest impact in improving our agents performance, as the exploration was minimized and our agent was able to act optimally more often. Although $\epsilon$-greedy exploration is important in order to explore new states, since we only have two actions, it is easy to explore new states in this case and more beneficial to stop adding random exploration which sabotages the agent's optimal action which is likely correct. \\
+
+For the second part to optimize our Q-Learning implementation, I have chosen set the learning rate $\alpha(s,a) = \frac{1}{N(s, a)}$, where $N(s, a)$ is the number of times action a is taken in state s. This ensures that we are decaying our learning rate over time. As long as we Visit every action in every state infinitely often, since we now decay the learning rate over time, Q-learning is guaranteed to converge to the optimal Q-values. \\
+Using this time-varying definition for $\alpha$, and choosing $\epsilon = 0.001$ since it demonstrated a much better performance of the agent regardless of the values of $\gamma$ and $\alpha$ in the first part, we now have the following agent performance metrics for the same range of $\gamma$:
+\begin{center}
+\begin{tabular}{||c c c c||} 
+ \hline
+ $\gamma$ & $\epsilon$ & Average score from epochs 50-100 & Highest score over all epochs \\ 
+ \hline\hline
+ 0.6 & 0.001 & 84.80 & 922 \\
+ \hline
+ 0.7 & 0.001 & 77.12 & 496 \\ 
+ \hline
+ 0.8 & 0.001 & 86.21 & 1005 \\ 
+ \hline
+\end{tabular}
+\end{center}
+We see that the average score from epochs 50-100 is much higher with temporal learning rate decay as opposed to without! We also see that the highest score over all epochs is just as large as our first version of Q-Learning (although this metric is less meaningful compared to the average score from epochs 50-100).
 
 \newpage
 \newpage
@@ -331,8 +476,11 @@ discount rate $\gamma$, and exploration rate $\epsilon$. \emph{Do not use outsid
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \subsection*{Name}
+Arnav Srivastava
 \subsection*{Collaborators and Resources}
 Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+No and No.
 \subsection*{Calibration}
 Approximately how long did this homework take you to complete (in hours)? 
+It took me many hours to complete this homework. But Swingy Monkey is my rock. Thank you for this.
 \end{document}
